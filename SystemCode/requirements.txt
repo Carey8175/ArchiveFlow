@@ -1,0 +1,7 @@
+pymysql
+pandas
+langchain
+langchain_community
+opencv-python
+unstructured
+fitz
