@@ -1,8 +1,8 @@
 from typing import List, Union, Callable
 from SystemCode.configs.basic import SENTENCE_SIZE
 from SystemCode.utils.chinese_text_splitter import ChineseTextSplitter
-from SystemCode.utils.loader import *
-from langchain.document_loaders import UnstructuredFileLoader, TextLoader, UnstructuredWordDocumentLoader
+from SystemCode.utils.loader import UnstructuredPaddleImageLoader, UnstructuredPaddlePDFLoader
+from langchain_community.document_loaders import UnstructuredFileLoader, TextLoader, UnstructuredWordDocumentLoader
 
 
 class File:
@@ -66,3 +66,9 @@ class File:
             docs = []
 
         return docs
+
+
+if __name__ == '__main__':
+    file = File("file_id", "kb_id", "file_name", "/Users/carey/Code/Rag/SystemCode/core/天降神婿.txt")
+    docs = file.split_file(None)
+    1

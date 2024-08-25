@@ -1,7 +1,7 @@
 import logging
+import time
 import pymysql
-
-from mysql_pool import MySQLThreadPool
+from SystemCode.connector.database.mysql_pool import MySQLThreadPool
 from SystemCode.configs.database import *
 from SystemCode.configs.basic import LOG_LEVEL
 
@@ -54,10 +54,14 @@ class MySQLClient:
         cursor.close()
         conn.close()
 
-    def execute_query_(self, query, params, commit=False, fetch=False):
+    def execute_query_(self, query, params, commit=False, fetch=False, many=False):
         conn = self.conn_pool.get_connection()
-        cursor = conn.cursor(buffered=True)
-        cursor.execute(query, params)
+        cursor = conn.cursor()
+
+        if many:
+            cursor.executemany(query, params)
+        else:
+            cursor.execute(query, params)
 
         if commit:
             conn.commit()
@@ -69,6 +73,7 @@ class MySQLClient:
 
         cursor.close()
         self.conn_pool.release_connection(conn)
+        logging.info("[SUCCESS] Query executed successfully with sql: {} \n".format(query))
 
         return result
 
@@ -103,7 +108,6 @@ class MySQLClient:
                 timestamp VARCHAR(255),
                 deleted BOOL DEFAULT 0,
                 file_size INT DEFAULT -1,
-                content_length INT DEFAULT -1,
                 chunk_size INT DEFAULT -1,
                 FOREIGN KEY (kb_id) REFERENCES KnowledgeBase(kb_id) ON DELETE CASCADE
             );
@@ -111,17 +115,37 @@ class MySQLClient:
         """
         self.execute_query_(query, (), commit=True)
 
+        # query = """
+        #     CREATE TABLE Embedding (
+        #         chunk_id VARCHAR(64),
+        #         kb_id VARCHAR(255),
+        #         file_id VARCHAR(64),
+        #         timestamp VARCHAR(64),
+        #         content TEXT,
+        #         embedding TEXT,
+        #         PRIMARY KEY (chunk_id, kb_id)
+        #         )
+        #     partition by key (kb_id)
+        #     partitions 10;
+        # """
+        # self.execute_query_(query, (), commit=True)
+
+    def insert_file(self, file_id, kb_id, file_name, file_path, status, file_size, docs, embeddings):
+        # table: File
         query = """
-            CREATE TABLE Embedding (
-                chunk_id VARCHAR(64),
-                kb_id VARCHAR(255),
-                file_id VARCHAR(64),
-                timestamp VARCHAR(64),
-                content VARCHAR(4000),
-                embedding VECTOR(768),
-                PRIMARY KEY (chunk_id, kb_id)
-                )
-            partition by key (kb_id)
-            partitions 10;
+            INSERT INTO File (file_id, kb_id, file_name, file_path, status, timestamp, deleted, file_size, chunk_size)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
-        self.execute_query_(query, (), commit=True)
+
+        self.execute_query_(query, (file_id, kb_id, file_name, file_path, status, str(time.time()).split('.')[0], False, file_size, len(docs)), commit=True)
+
+        # table: Embedding
+
+        logging.info("[ SUCCESS ]File inserted successfully")
+
+        return True
+
+
+if __name__ == '__main__':
+    client = MySQLClient('local')
+    client.create_tables_()

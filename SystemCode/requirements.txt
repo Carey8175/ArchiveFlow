@@ -4,4 +4,9 @@ langchain
 langchain_community
 opencv-python
 unstructured
-fitz
+BCEmbedding
+sanic
+frontend
+PyMuPDF
+cryptography
+BCEmbedding

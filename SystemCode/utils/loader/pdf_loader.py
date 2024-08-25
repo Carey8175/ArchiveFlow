@@ -1,7 +1,7 @@
 """Loader that loads image files."""
 from typing import List, Callable
 
-from langchain.document_loaders.unstructured import UnstructuredFileLoader
+from langchain_community.document_loaders.unstructured import UnstructuredFileLoader
 from unstructured.partition.text import partition_text
 import os
 import fitz
