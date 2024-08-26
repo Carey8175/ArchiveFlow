@@ -8,7 +8,7 @@ from sanic.request import Request
 from SystemCode.core.file import File
 from BCEmbedding import EmbeddingModel
 from SystemCode.connector.database.mysql_client import MySQLClient
-from SystemCode.configs.database import MYSQL_CONNECT_MODE
+from SystemCode.configs.database import CONNECT_MODE
 
 # ------------------ File Server ------------------
 # route list
@@ -18,7 +18,7 @@ from SystemCode.configs.database import MYSQL_CONNECT_MODE
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-app = Sanic("FileServer")
+file_server_app = Sanic("FileServer")
 logging.info("File Server Starting")
 
 current_file_path = os.path.abspath(__file__)
@@ -41,7 +41,7 @@ except Exception as e:
 logging.info("Embedding model loaded successfully")
 
 # Initialize the MySQL client
-mysql_client = MySQLClient(mode=MYSQL_CONNECT_MODE)
+mysql_client = MySQLClient(mode=CONNECT_MODE)
 logging.info("MySQL client initialized successfully")
 
 
@@ -109,4 +109,4 @@ async def download_file(request: Request):
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=6006, single_process=True, debug=True)
+    file_server_app.run(host="127.0.0.1", port=6006, single_process=True, debug=True)

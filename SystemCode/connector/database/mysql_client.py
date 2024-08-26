@@ -147,5 +147,5 @@ class MySQLClient:
 
 
 if __name__ == '__main__':
-    client = MySQLClient('local')
+    client = MySQLClient('remote')
     client.create_tables_()
