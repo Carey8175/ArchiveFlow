@@ -4,6 +4,7 @@ from typing import List
 from SystemCode.configs.basic import SENTENCE_SIZE
 
 
+
 class ChineseTextSplitter(CharacterTextSplitter):
     def __init__(self, pdf: bool = False, sentence_size: int = SENTENCE_SIZE, **kwargs):
         super().__init__(**kwargs)
