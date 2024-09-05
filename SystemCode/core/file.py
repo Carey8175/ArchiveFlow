@@ -69,6 +69,8 @@ class File:
 
 
 if __name__ == '__main__':
-    file = File("file_id", "kb_id", "file_name", "/Users/carey/Code/Rag/SystemCode/core/天降神婿.txt")
+    import uuid
+
+    file = File(uuid.uuid4().hex, uuid.uuid4().hex, "file_name", "/Users/carey/Code/Rag/SystemCode/core/天降神婿.txt")
     docs = file.split_file(None)
-    1
+    2
