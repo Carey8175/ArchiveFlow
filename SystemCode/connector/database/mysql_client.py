@@ -130,7 +130,7 @@ class MySQLClient:
         # """
         # self.execute_query_(query, (), commit=True)
 
-    def insert_file(self, file_id, kb_id, file_name, file_path, status, file_size, docs, embeddings):
+    def insert_file(self, file_id, kb_id, file_name, file_path, status, file_size, docs):
         # table: File
         query = """
             INSERT INTO File (file_id, kb_id, file_name, file_path, status, timestamp, deleted, file_size, chunk_size)

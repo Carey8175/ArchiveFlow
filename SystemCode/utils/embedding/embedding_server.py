@@ -1,8 +1,8 @@
+import asyncio
 from sanic import Sanic
 from sanic import response
 from sanic.request import Request
 from concurrent.futures import ThreadPoolExecutor
-import asyncio
 from BCEmbedding import EmbeddingModel
 
 # ------------------ Embedding Server ------------------
