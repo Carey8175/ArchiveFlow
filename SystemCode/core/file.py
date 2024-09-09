@@ -70,7 +70,9 @@ class File:
 
 if __name__ == '__main__':
     import uuid
+    from paddleocr import PaddleOCR
 
-    file = File(uuid.uuid4().hex, uuid.uuid4().hex, "file_name", "/Users/carey/Code/Rag/SystemCode/core/天降神婿.txt")
-    docs = file.split_file(None)
+    ocr_engine = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=False, show_log=True)
+    file = File(uuid.uuid4().hex, uuid.uuid4().hex, "test.png", "test.png")
+    docs = file.split_file(ocr_engine)
     2

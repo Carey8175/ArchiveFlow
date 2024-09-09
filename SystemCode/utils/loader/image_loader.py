@@ -31,7 +31,7 @@ class UnstructuredPaddleImageLoader(UnstructuredFileLoader):
             img_np = cv2.imread(filepath)
             h, w, c = img_np.shape
             img_data = {"img64": base64.b64encode(img_np).decode("utf-8"), "height": h, "width": w, "channels": c}
-            result = self.ocr_engine(img_data)
+            result = self.ocr_engine(img_np)
             result = [line for line in result if line]
 
             ocr_result = [i[1][0] for line in result for i in line]
