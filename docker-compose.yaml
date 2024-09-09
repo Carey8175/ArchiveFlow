@@ -75,6 +75,7 @@ services:
 
 volumes:
     orag_mysql_data:
+      name: orag_mysql_data
 
 networks:
   default:
