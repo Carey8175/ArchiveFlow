@@ -77,4 +77,4 @@ if __name__ == '__main__':
     ocr_engine = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=False, show_log=True)
     file = File(uuid.uuid4().hex, uuid.uuid4().hex, "test.png", "test.png")
     docs = file.split_file(ocr_engine)
-    1
+    3
