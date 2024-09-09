@@ -78,4 +78,4 @@ volumes:
 
 networks:
   default:
-    name: qanything_milvus_mysql_local
+    name: orag_milvus_mysql_local
