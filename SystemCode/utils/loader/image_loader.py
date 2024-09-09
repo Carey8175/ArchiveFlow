@@ -30,11 +30,13 @@ class UnstructuredPaddleImageLoader(UnstructuredFileLoader):
             filename = os.path.split(filepath)[-1]
             img_np = cv2.imread(filepath)
             h, w, c = img_np.shape
-            img_data = {"img64": base64.b64encode(img_np).decode("utf-8"), "height": h, "width": w, "channels": c}
+            # img_data = {"img64": base64.b64encode(img_np).decode("utf-8"), "height": h, "width": w, "channels": c}
             result = self.ocr_engine(img_np)
-            result = [line for line in result if line]
+            if result:
+                # just keep the txt info
+                result = result[1]
 
-            ocr_result = [i[1][0] for line in result for i in line]
+            ocr_result = [line[0] for line in result]
             txt_file_path = os.path.join(full_dir_path, "%s.txt" % (filename))
             with open(txt_file_path, 'w', encoding='utf-8') as fout:
                 fout.write("\n".join(ocr_result))
@@ -43,3 +45,26 @@ class UnstructuredPaddleImageLoader(UnstructuredFileLoader):
         txt_file_path = image_ocr_txt(self.file_path)
         from unstructured.partition.text import partition_text
         return partition_text(filename=txt_file_path, **self.unstructured_kwargs)
+
+    def turn_to_txt_file(self) -> str:
+        def image_ocr_txt(filepath, dir_path="tmp_files"):
+            full_dir_path = os.path.join(os.path.dirname(filepath), dir_path)
+            if not os.path.exists(full_dir_path):
+                os.makedirs(full_dir_path)
+            filename = os.path.split(filepath)[-1]
+            img_np = cv2.imread(filepath)
+            h, w, c = img_np.shape
+            # img_data = {"img64": base64.b64encode(img_np).decode("utf-8"), "height": h, "width": w, "channels": c}
+            result = self.ocr_engine(img_np)
+            if result:
+                # just keep the txt info
+                result = result[1]
+
+            ocr_result = [line[0] for line in result]
+            txt_file_path = os.path.join(full_dir_path, "%s.txt" % (filename))
+            with open(txt_file_path, 'w', encoding='utf-8') as fout:
+                fout.write("\n".join(ocr_result))
+            return txt_file_path
+
+        txt_file_path = image_ocr_txt(self.file_path)
+        return txt_file_path
