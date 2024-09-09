@@ -57,6 +57,8 @@ class File:
             docs = loader.load_and_split(texts_splitter)
         elif self.type == "img":
             loader = UnstructuredPaddleImageLoader(self.file_path, ocr_engine, mode="elements")
+            txt_file_path = loader.turn_to_txt_file()
+            loader = TextLoader(txt_file_path, autodetect_encoding=True)
             texts_splitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
             docs = loader.load_and_split(texts_splitter)
         elif self.type == "docx":
