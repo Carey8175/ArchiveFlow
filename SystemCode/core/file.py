@@ -1,8 +1,13 @@
+import ssl
 from typing import List, Union, Callable
 from SystemCode.configs.basic import SENTENCE_SIZE
 from SystemCode.utils.chinese_text_splitter import ChineseTextSplitter
 from SystemCode.utils.loader import UnstructuredPaddleImageLoader, UnstructuredPaddlePDFLoader
 from langchain_community.document_loaders import UnstructuredFileLoader, TextLoader, UnstructuredWordDocumentLoader
+
+
+# ignore the SSL verification
+ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class File:
