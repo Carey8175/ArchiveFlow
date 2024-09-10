@@ -11,5 +11,4 @@ PyMuPDF
 cryptography
 BCEmbedding
 pymilvus
-paddlepaddle
-paddleocr
+
