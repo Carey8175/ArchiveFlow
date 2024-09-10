@@ -78,6 +78,6 @@ if __name__ == '__main__':
     from paddleocr import PaddleOCR
 
     ocr_engine = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=False, show_log=True)
-    file = File(uuid.uuid4().hex, uuid.uuid4().hex, "S-PSUPR Day1b.pdf", "S-PSUPR Day1b.pdf")
+    file = File(uuid.uuid4().hex, uuid.uuid4().hex, "case_study.docx", "case_study.docx")
     docs = file.split_file(ocr_engine)
     2
