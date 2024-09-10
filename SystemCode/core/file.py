@@ -1,8 +1,13 @@
+import ssl
 from typing import List, Union, Callable
 from SystemCode.configs.basic import SENTENCE_SIZE
 from SystemCode.utils.chinese_text_splitter import ChineseTextSplitter
 from SystemCode.utils.loader import UnstructuredPaddleImageLoader, UnstructuredPaddlePDFLoader
 from langchain_community.document_loaders import UnstructuredFileLoader, TextLoader, UnstructuredWordDocumentLoader
+
+
+# ignore the SSL verification
+ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class File:
@@ -57,8 +62,6 @@ class File:
             docs = loader.load_and_split(texts_splitter)
         elif self.type == "img":
             loader = UnstructuredPaddleImageLoader(self.file_path, ocr_engine, mode="elements")
-            txt_file_path = loader.turn_to_txt_file()
-            loader = TextLoader(txt_file_path, autodetect_encoding=True)
             texts_splitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
             docs = loader.load_and_split(texts_splitter)
         elif self.type == "docx":
@@ -74,7 +77,7 @@ if __name__ == '__main__':
     import uuid
     from paddleocr import PaddleOCR
 
-    # ocr_engine = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=False, show_log=True)
-    file = File(uuid.uuid4().hex, uuid.uuid4().hex, "classic_net.md", "classic_net.md")
-    docs = file.split_file(None)
-    3
+    ocr_engine = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=False, show_log=True)
+    file = File(uuid.uuid4().hex, uuid.uuid4().hex, "S-PSUPR Day1b.pdf", "S-PSUPR Day1b.pdf")
+    docs = file.split_file(ocr_engine)
+    2
