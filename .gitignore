@@ -1,1 +1,7 @@
 volumes/
+
+*.txt
+*.npy
+*.pdf
+*.png
+
