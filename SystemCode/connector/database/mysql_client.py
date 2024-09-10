@@ -145,6 +145,14 @@ class MySQLClient:
 
         return True
 
+    def get_file_not_embedded(self):
+        query = """
+            SELECT file_id, file_path FROM File WHERE status='waiting';
+        """
+        results = self.execute_query_(query, (), fetch=True)
+
+        return results
+
 
 if __name__ == '__main__':
     client = MySQLClient('remote')
