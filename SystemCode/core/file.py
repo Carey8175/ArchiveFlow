@@ -11,7 +11,7 @@ class File:
         self.kb_id = kb_id
         self.file_name = file_name
         self.file_path = file_path
-
+        self.file_url = ''
         self._init_type()
 
     def __str__(self):
@@ -31,6 +31,10 @@ class File:
             self.type = "img"
         elif self.file_path.lower().endswith(".docx"):
             self.type = "docx"
+        elif isinstance(file, str):
+            self.file_location = "URL"
+            self.file_content = b''
+            self.file_url = file
         else:
             self.type = None
 
