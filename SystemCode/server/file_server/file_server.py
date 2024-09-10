@@ -16,7 +16,7 @@ class FileSystem:
         """ get the embedding result of the file"""
 
         return
-        pass
+
 
     def start(self):
         """
