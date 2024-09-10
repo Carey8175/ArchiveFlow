@@ -40,9 +40,13 @@ class UnstructuredPaddlePDFLoader(UnstructuredFileLoader):
 
                     img_data = {"img64": base64.b64encode(img).decode("utf-8"), "height": pix.h, "width": pix.w,
                                 "channels": pix.n}
-                    result = self.ocr_engine(img_data)
-                    result = [line for line in result if line]
-                    ocr_result = [i[1][0] for line in result for i in line]
+                    result = self.ocr_engine(img)
+                    if result:
+                        # just keep the txt info
+                        result = result[1]
+
+                    ocr_result = [line[0] for line in result if len(line[0]) > 5]
+
                     fout.write("\n".join(ocr_result))
             if os.path.exists(img_name):
                 os.remove(img_name)
