@@ -17,7 +17,6 @@ class FileSystem:
 
         return
 
-
     def start(self):
         """
         keep searching the file is not embedded and do the embedding
