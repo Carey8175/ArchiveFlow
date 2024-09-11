@@ -15,6 +15,8 @@ FILE_SYSTEM_SLEEP_TIME = 5
 current_file_path = os.path.abspath(__file__)
 # 获取当前文件的父级文件夹
 parent_directory = os.path.dirname(current_file_path)
+# the content file path: SystemCode/content/User/knowledgeBase/single_file
+content_file_path = os.path.join(os.path.dirname(parent_directory), "content")
 model_path = os.path.join(parent_directory, "models", "bce-embedding-base_v1")
 model_name = "maidalun1020/bce-embedding-base_v1"
 
@@ -31,8 +33,9 @@ class FileSystem:
 
     def embedding_file(self, docs) -> np.array:
         """ get the embedding result of the file"""
+        docs_content = [doc.page_content for doc in docs]
 
-        return
+        return self.embed_model.encode(docs_content)
 
     def start(self):
         """

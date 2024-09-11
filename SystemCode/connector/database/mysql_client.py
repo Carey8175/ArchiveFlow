@@ -147,7 +147,7 @@ class MySQLClient:
 
     def get_file_not_embedded(self):
         query = """
-            SELECT file_id, file_path FROM File WHERE status='waiting';
+            SELECT file_id, file_name, file_path FROM File WHERE status='waiting';
         """
         results = self.execute_query_(query, (), fetch=True)
 
