@@ -147,7 +147,9 @@ class MySQLClient:
 
     def get_file_not_embedded(self):
         query = """
-            SELECT file_id, file_name, file_path FROM File WHERE status='waiting';
+            select file_id, File.kb_id, user_id, file_name, file_path
+            from ORAG.File
+            left join ORAG.KnowledgeBase KB on File.kb_id = KB.kb_id;
         """
         results = self.execute_query_(query, (), fetch=True)
 
