@@ -49,13 +49,14 @@ async def new_knowledge_base(req: sanic_request):
 
     logging.info("[API]-[new knowledge base] user_id: %s", user_id)
     if user_id is None:
-        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+        return sanic_json({"code": 2002, "msg": f'[user_id]输入非法！request.json：{req.json}，请检查！'})
     is_valid = validate_user_id(user_id)
     if not is_valid:
         return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
     logging.info("new_knowledge_base %s", user_id)
     kb_name = safe_get(req, 'kb_name')
-    
+    if kb_name is None:
+        return sanic_json({"code": 2002, "msg": f'[kb_name]输入非法！request.json：{req.json}，请检查！'})
 
     kb_id = 'KB' + uuid.uuid4().hex
     mysql_client.create_milvus_collection(user_id, kb_id, kb_name)
