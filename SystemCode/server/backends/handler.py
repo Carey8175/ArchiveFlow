@@ -59,7 +59,7 @@ async def new_knowledge_base(req: sanic_request):
         return sanic_json({"code": 2002, "msg": f'[kb_name]输入非法！request.json：{req.json}，请检查！'})
 
     kb_id = 'KB' + uuid.uuid4().hex
-    mysql_client.create_milvus_collection(user_id, kb_id, kb_name)
+    mysql_client.create_milvus_collection(kb_id, user_id, kb_name)
     now = datetime.now()
     timestamp = now.strftime("%Y%m%d%H%M")
     return sanic_json({"code": 200, "msg": "success create knowledge base {}".format(kb_id),
