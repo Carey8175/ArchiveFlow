@@ -1,5 +1,6 @@
 import logging
 import time
+import uuid
 import pymysql
 from SystemCode.connector.database.mysql_pool import MySQLThreadPool
 from SystemCode.configs.database import *
@@ -145,7 +146,77 @@ class MySQLClient:
 
         return True
 
+    def check_user_exist_(self, user_id):
+        query = "SELECT user_id FROM User WHERE user_id = %s"
+        result = self.execute_query_(query, (user_id,), fetch=True)
+        logging.info("check_user_exist {}".format(result))
+        return result is not None and len(result) > 0
+
+    def add_user_(self, user_id, user_name=None):
+        query = "INSERT INTO User (user_id, user_name) VALUES (%s, %s)"
+        self.execute_query_(query, (user_id, user_name), commit=True)
+        return user_id
+
+    def create_milvus_collection(self, kb_id, user_id, kb_name, user_name=None):
+        if not self.check_user_exist_(user_id):
+            self.add_user_(user_id, user_name)
+        query = "INSERT INTO KnowledgeBase (kb_id, user_id, kb_name) VALUES (%s, %s, %s)"
+        self.execute_query_(query, (kb_id, user_id, kb_name), commit=True)
+        return kb_id, "success"
+
+    def placeholders(self, query, data):
+        data = data if isinstance(data, list) else [data]
+        placeholders = ','.join(['%s'] * len(data))
+        return query.format(placeholders)
+
+    def check_kb_exist(self, user_id, kb_ids) -> list:
+        # 使用参数化查询
+        query = "SELECT kb_id FROM KnowledgeBase WHERE kb_id IN ({}) AND deleted = 0 AND user_id = %s"
+        query = self.placeholders(query,kb_ids)
+        query_params = kb_ids + [user_id]
+        result = self.execute_query_(query, query_params, fetch=True)
+        logging.info("check_kb_exist {}".format(result))
+        valid_kb_ids = [kb_info[0] for kb_info in result]
+        unvalid_kb_ids = list(set(kb_ids) - set(valid_kb_ids))
+        return unvalid_kb_ids
+
+    def check_file_exist_by_name(self, user_id, kb_id, file_names):
+        results = []
+        batch_size = 100  # 根据实际情况调整批次大小
+
+        # 分批处理file_names
+        for i in range(0, len(file_names), batch_size):
+            batch_file_names = file_names[i:i + batch_size]
+
+            query = """
+                SELECT file_id, file_name, file_size, status FROM File 
+                WHERE deleted = 0
+                AND file_name IN ({})
+                AND kb_id = %s 
+                AND kb_id IN (SELECT kb_id FROM KnowledgeBase WHERE user_id = %s)
+            """
+            query = self.placeholders(query, batch_file_names)
+            query_params = batch_file_names + [kb_id, user_id]
+            batch_result = self.execute_query_(query, query_params, fetch=True)
+            logging.info("check_file_exist_by_name batch {}: {}".format(i // batch_size, batch_result))
+            results.extend(batch_result)
+
+        return results
+
+    def add_file(self, user_id, kb_id, file_name, timestamp, file_size, file_path, status="waiting"):
+        # 如果他传回来了一个id, 那就说明这个表里肯定有
+        if not self.check_user_exist_(user_id):
+            return None, "invalid user_id, please check..."
+        not_exist_kb_ids = self.check_kb_exist(user_id, [kb_id])
+        if not_exist_kb_ids:
+            return None, f"invalid kb_id, please check {not_exist_kb_ids}"
+        file_id = uuid.uuid4().hex
+        query = "INSERT INTO File (file_id, kb_id, file_name, status, timestamp, file_size, file_path) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        self.execute_query_(query, (file_id, kb_id, file_name, status, timestamp, file_size, file_path), commit=True)
+        logging.info("add_file: {}".format(file_id))
+        return file_id, "success"
+
 
 if __name__ == '__main__':
     client = MySQLClient('remote')
-    client.create_tables_()
+    client.check_kb_exist('1', ['1'])

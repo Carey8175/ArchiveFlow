@@ -292,10 +292,6 @@ class MilvusClient:
             return new_cands
 
 
-async def insert(db, docs, embeddings):
-    result = await db.insert_files('test', '天降神婿.txt', '../../core/天降神婿.txt', docs, embeddings)
-
-
 if __name__ == '__main__':
     test = MilvusClient(
         mode='remote',
@@ -328,8 +324,6 @@ if __name__ == '__main__':
     import numpy as np
     # np.save('embeddings.npy', embeddings)
     # embeddings = np.load('embeddings.npy')
-
-    asyncio.run(insert(test, docs, embeddings))
 
     while True:
         time.sleep(1)
