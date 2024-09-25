@@ -1,12 +1,85 @@
+import os
+import requests
+from typing import Optional, Set, List, Any
+from urllib.parse import urljoin, urldefrag
+from bs4 import BeautifulSoup
+from unstructured.partition.text import partition_text
 
-class URL:
+
+class URLToTextConverter:
     def __init__(
-            self,
-            url: str,
-            exclude_dirs: Optional[str] = None,
-            max_depth: int = -1
-    ) -> None:
-
-        self.url = url
-        self.exclude_dirs = exclude_dirs
+        self,
+        base_url: str,
+        output_dir: str = "url_text_files",
+        max_depth: int = 5,
+        exclude_dirs: Optional[List[str]] = None,
+        **unstructured_kwargs: Any,
+    ):
+        self.base_url = base_url
+        self.output_dir = output_dir
         self.max_depth = max_depth
+        self.exclude_dirs = exclude_dirs or []
+        self.unstructured_kwargs = unstructured_kwargs
+
+        # Create the output directory if it doesn't exist
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+    def url_to_txt(self, url: str, depth: int = 0, visited: Optional[Set[str]] = None) -> Optional[str]:
+        visited = visited or set()
+
+        # Stop if maximum depth is reached or URL already visited
+        if depth > self.max_depth or url in visited:
+            return None
+
+        # Exclude certain directories
+        if any(url.startswith(exclude_dir) for exclude_dir in self.exclude_dirs):
+            return None
+
+        visited.add(url)
+
+        try:
+            # Fetch the content of the URL
+            response = requests.get(url)
+            if response.status_code != 200:
+                print(f"Failed to retrieve URL: {url} (Status code: {response.status_code})")
+                return None
+
+            # Parse the page content
+            soup = BeautifulSoup(response.text, "html.parser")
+            page_text = soup.get_text()
+
+            # Save content to a txt file
+            output_path = os.path.join(self.output_dir, self._sanitize_filename(url) + ".txt")
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(f"URL: {url}\n\n")  # Include the URL at the top of the file
+                f.write(page_text)  # Write the page's text content
+
+            print(f"Saved content from {url} to {output_path}")
+
+            # Recursively process child links
+            child_links = self._get_child_links(soup, url)
+            for link in child_links:
+                if link not in visited:
+                    self.url_to_txt(link, depth + 1, visited)  # Ensure using self to call the method
+
+            return output_path
+
+        except Exception as e:
+            print(f"Error processing {url}: {e}")
+            return None
+
+    def _get_elements(self) -> List:
+        """Main method to start the extraction process."""
+        txt_file_path = self.url_to_txt(self.base_url)  # Use self to call the url_to_txt
+        return partition_text(filename=txt_file_path, **self.unstructured_kwargs)
+
+    def _get_child_links(self, soup: BeautifulSoup, base_url: str) -> List[str]:
+        """Extract and return all valid child links on the page."""
+        all_links = [urljoin(base_url, a.get('href')) for a in soup.find_all('a', href=True)]
+        child_links = [urldefrag(link).url for link in all_links if link.startswith(base_url)]
+        return list(set(child_links))  # Remove duplicates
+
+    def _sanitize_filename(self, url: str) -> str:
+        """Create a valid filename from a URL."""
+        return url.replace("http://", "").replace("https://", "").replace("/", "_").replace("?", "_")
