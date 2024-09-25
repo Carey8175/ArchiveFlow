@@ -4,17 +4,20 @@ from typing import Optional, Set, List, Any
 from urllib.parse import urljoin, urldefrag
 from bs4 import BeautifulSoup
 from unstructured.partition.text import partition_text
+from langchain_community.document_loaders import UnstructuredFileLoader
 
 
-class URLToTextConverter:
+class URLToTextConverter(UnstructuredFileLoader):
     def __init__(
         self,
         base_url: str,
-        output_dir: str = "url_text_files",
+        output_dir: str = "tmp_files",
         max_depth: int = 5,
         exclude_dirs: Optional[List[str]] = None,
+        mode: str = "elements",
         **unstructured_kwargs: Any,
     ):
+        super().__init__(file_path=base_url, mode=mode, **unstructured_kwargs)
         self.base_url = base_url
         self.output_dir = output_dir
         self.max_depth = max_depth
@@ -82,4 +85,4 @@ class URLToTextConverter:
 
     def _sanitize_filename(self, url: str) -> str:
         """Create a valid filename from a URL."""
-        return url.replace("http://", "").replace("https://", "").replace("/", "_").replace("?", "_")
+        return url.replace("http://", "").replace("https://", "").replace("/", "_").replace("?", "_").replace(".", "_")

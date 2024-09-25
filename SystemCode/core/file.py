@@ -74,8 +74,9 @@ class File:
             loader = UnstructuredWordDocumentLoader(self.file_path, mode="elements")
             docs = loader.load()
         elif self.type == "url":
-            loader = URLToTextConverter(self.url, output_dir="url_text_files")
-            docs = loader._get_elements()
+            loader = URLToTextConverter(self.url)
+            texts_splitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
+            docs = loader.load_and_split(texts_splitter)
         else:
             docs = []
 
