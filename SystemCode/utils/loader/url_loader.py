@@ -1,8 +1,10 @@
 import os
+import re
 import requests
 from typing import Optional, Set, List, Any
 from urllib.parse import urljoin, urldefrag
 from bs4 import BeautifulSoup
+from SystemCode.configs.basic import SENTENCE_SIZE
 from unstructured.partition.text import partition_text
 from langchain_community.document_loaders import UnstructuredFileLoader
 
@@ -50,13 +52,16 @@ class URLToTextConverter(UnstructuredFileLoader):
 
             # Parse the page content
             soup = BeautifulSoup(response.text, "html.parser")
-            page_text = soup.get_text()
+            page_text = " ".join(soup.stripped_strings)
+            clean_text = self._clean_text(page_text)
+            segments = self._split_text_by_size(clean_text, SENTENCE_SIZE) # Separate content to segments
 
             # Save content to a txt file
             output_path = os.path.join(self.output_dir, self._sanitize_filename(url) + ".txt")
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(f"URL: {url}\n\n")  # Include the URL at the top of the file
-                f.write(page_text)  # Write the page's text content
+                for segment in segments:
+                    f.write(segment + "\n") # Write each segment
 
             print(f"Saved content from {url} to {output_path}")
 
@@ -76,6 +81,15 @@ class URLToTextConverter(UnstructuredFileLoader):
         """Main method to start the extraction process."""
         txt_file_path = self.url_to_txt(self.base_url)  # Use self to call the url_to_txt
         return partition_text(filename=txt_file_path, **self.unstructured_kwargs)
+
+    def _clean_text(self, text: str) -> str:
+        """remove extra spaces"""
+        text = re.sub(r'\s+', ' ', text)
+        return text.strip()
+
+    def _split_text_by_size(self, text: str, max_size: int) -> List[str]:
+        """split page content by max_size"""
+        return [text[i:i + max_size] for i in range(0, len(text), max_size)]
 
     def _get_child_links(self, soup: BeautifulSoup, base_url: str) -> List[str]:
         """Extract and return all valid child links on the page."""
