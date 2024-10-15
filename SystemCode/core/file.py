@@ -11,7 +11,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class File:
-    def __init__(self, file_id, kb_id, file_name, file_path, url):
+    def __init__(self, file_id, kb_id, file_name, file_path, url=None):
         self.file_id = file_id
         self.kb_id = kb_id
         self.file_name = file_name
