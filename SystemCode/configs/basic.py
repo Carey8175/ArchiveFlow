@@ -9,3 +9,7 @@ EMBEDDING_PORT = 18000
 # ----------------- 以下为File Server相关配置 -----------------
 FILE_SERVER_PORT = 18001
 TASK_TIMEOUT = 10 * 60  # 任务超时时间，单位为秒, 超时后删除任务
+
+
+# ----------------- 以下为File Server相关配置 -----------------
+MAX_DEPTH = 5
