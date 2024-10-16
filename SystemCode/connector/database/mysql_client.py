@@ -145,16 +145,6 @@ class MySQLClient:
 
         return True
 
-    def get_file_not_embedded(self):
-        query = """
-            SELECT file_id, File.kb_id, user_id, file_name, file_path
-            FROM ORAG.File
-            LEFT JOIN ORAG.KnowledgeBase KB ON File.kb_id = KB.kb_id;
-        """
-        results = self.execute_query_(query, (), fetch=True)
-
-        return results
-
 
 if __name__ == '__main__':
     client = MySQLClient('remote')

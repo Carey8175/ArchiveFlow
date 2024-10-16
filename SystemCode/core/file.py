@@ -93,3 +93,4 @@ if __name__ == '__main__':
 
     url_file = File(uuid.uuid4().hex, uuid.uuid4().hex, "wikipedia", None, url="https://zh.wikipedia.org")
     url_docs = url_file.split_file(ocr_engine)
+    2
