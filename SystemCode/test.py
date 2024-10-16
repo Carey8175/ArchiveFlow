@@ -48,7 +48,11 @@ if __name__ == '__main__':
     from SystemCode.connector.database.mysql_client import MySQLClient
 
     mysql_client = MySQLClient('remote')
-    a = mysql_client.check_kb_exist(user_id='c89149173e4b435cbf0f5be4302086c4', kb_ids=['KB2c8356644492cbadd36a176e8b7f3'])
+    mysql_client.update_user_name(
+        user_id='Uf359e0df1eac498e91b3adaeb986ba0c',
+        user_name='holyshit',
+        new_user_name='holyshit2'
+    )
 
     connect_to_milvus()
     collections_ = list_collections_in_milvus()

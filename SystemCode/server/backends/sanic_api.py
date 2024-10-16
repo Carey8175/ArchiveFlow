@@ -64,6 +64,14 @@ app.add_route(list_knowledge_base, "/api/orag/select/knowledge_base", methods=['
 # app.add_route(list_docs, "/api/orag/select/document", methods=['POST'])  # tags=["文件列表"]
 app.add_route(get_user_id_by_name, "/api/orag/select/user_id", methods=['POST'])  # tags=["获取用户ID"]
 
+# update ------------------------------------------------------------------------------------------------
+app.add_route(update_user_name, "/api/orag/update/user_name", methods=['POST'])  # tags=["更新用户名"]
+app.add_route(update_knowledge_base_name, "/api/orag/update/knowledge_base_name", methods=['POST'])  # tags=["更新知识库名"]
+
+# search ------------------------------------------------------------------------------------------------
+app.add_route(log_in, "/api/orag/search/login", methods=['POST'])  # tags=["登录"]
+
+
 #app.add_route(document, "/api/docs", methods=['GET'])
 
 #app.add_route(upload_weblink, "/api/local_doc_qa/upload_weblink", methods=['POST'])  # tags=["上传网页链接"]

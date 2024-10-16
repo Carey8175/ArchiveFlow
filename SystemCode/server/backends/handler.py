@@ -13,7 +13,7 @@ from sanic import request as sanic_request
 
 from SystemCode.configs.database import CONNECT_MODE
 from SystemCode.configs.basic import *
-from SystemCode.core.file import File
+# from SystemCode.core.file import File
 from SystemCode.utils.general_utils import *
 from SystemCode.connector.database.mysql_client import MySQLClient
 
@@ -40,7 +40,7 @@ def init_folders():
 
 async def new_knowledge_base(req: sanic_request):
     """
-    user_id, new_knowledge_base
+    user_id, new_knowledge_base_name
     create new knowledge base for user, insert into milvus, mysql
     """
     user_id = safe_get(req, 'user_id')
@@ -116,6 +116,39 @@ async def delete_knowledge_base(req: sanic_request):
     return sanic_json({"code": 200, "msg": "success delete knowledge base {}".format(kb_id)})
 
 
+async def update_knowledge_base_name(req: sanic_request):
+    """
+    user_id, kb_id, kb_name
+    update knowledge base name
+    """
+    user_id = safe_get(req, 'user_id')
+    if type(user_id) == list:
+        user_id = user_id[0]
+
+    logging.info("[API]-[update knowledge base name] user_id: %s", user_id)
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'[user_id]输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+
+    kb_id = safe_get(req, 'kb_id')
+    if kb_id is None:
+        return sanic_json({"code": 2002, "msg": f'[kb_id]输入非法！request.json：{req.json}，请检查！'})
+
+    kb_name = safe_get(req, 'kb_name')
+    if kb_name is None:
+        return sanic_json({"code": 2002, "msg": f'[kb_name]输入非法！request.json：{req.json}，请检查！'})
+
+    # validate the kb_id
+    invalid_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
+    if invalid_kb_ids:
+        return sanic_json({"code": 2001, "msg": f'invalid kb_id: {invalid_kb_ids}, please check...'})
+
+    mysql_client.update_knowledge_base_name(user_id, kb_id, kb_name)
+    return sanic_json({"code": 200, "msg": "success update knowledge base name"})
+
+
 # --------------------------- User ---------------------------
 async def add_new_user(req: sanic_request):
     """
@@ -127,7 +160,7 @@ async def add_new_user(req: sanic_request):
         return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
 
     # generate user_id
-    user_id = uuid.uuid4().hex
+    user_id = 'U' + uuid.uuid4().hex
 
     mysql_client.add_user_(user_id, user_name)
 
@@ -223,3 +256,54 @@ async def upload_files(req: sanic_request):
     return sanic_json({"code": 200, "msg": msg, "data": data})
 
 
+async def update_user_name(req: sanic_request):
+    """
+    user_name
+    user_id
+    new_user_name
+    update new username
+    """
+    user_id = safe_get(req, 'user_id')
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+    logging.info("update_user_name %s", user_id)
+
+    user_name = safe_get(req, 'user_name')
+    if not user_name:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    if not mysql_client.match_user_name_and_id(user_id, user_name):
+        return sanic_json({"code": 2001, "msg": f'用户名信息bu匹配，请检查用户名！'})
+
+    new_user_name = safe_get(req, 'new_user_name')
+    if new_user_name is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    if mysql_client.check_user_exist_by_name(new_user_name):
+        return sanic_json({"code": 2001, "msg": f'用户名{new_user_name}已存在，请更换！'})
+
+    mysql_client.update_user_name(user_id, user_name, new_user_name)
+
+    return sanic_json({"code": 200, "msg": "success update user name"})
+
+
+async def log_in(req: sanic_request):
+    """
+    user_name
+    log in
+    """
+    user_name = safe_get(req, 'user_name')
+    if user_name is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    status = mysql_client.check_user_exist_by_name(user_name)
+    if not status:
+        return sanic_json({"code": 200, "msg": f'用户名不存在，请检查！', "status": False})
+
+    sql = "SELECT user_id FROM User WHERE user_name = %s"
+    result = mysql_client.execute_query_(sql, (user_name,), fetch=True)
+    user_id = result[0][0]
+
+    return sanic_json({"code": 200, "msg": "success log in", "status": True, "data": {"user_id": user_id}})

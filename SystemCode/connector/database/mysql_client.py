@@ -152,6 +152,12 @@ class MySQLClient:
         logging.info("check_user_exist {}".format(result))
         return result is not None and len(result) > 0
 
+    def check_user_exist_by_name(self, user_name):
+        query = "SELECT user_name FROM User WHERE user_name = %s"
+        result = self.execute_query_(query, (user_name,), fetch=True)
+        logging.info("check_user_exist_by_name {}".format(result))
+        return result is not None and len(result) > 0
+
     def add_user_(self, user_id, user_name=None):
         query = "INSERT INTO User (user_id, user_name) VALUES (%s, %s)"
         self.execute_query_(query, (user_id, user_name), commit=True)
@@ -226,6 +232,20 @@ class MySQLClient:
         result = self.execute_query_(query, (user_id,), fetch=True)
         return result
 
+    def update_user_name(self, user_id, user_name, new_user_name):
+        query = "UPDATE User SET user_name = %s WHERE user_id = %s AND user_name = %s"
+        self.execute_query_(query, (new_user_name, user_id, user_name), commit=True, fetch=True)
+        return True
+
+    def update_knowledge_base_name(self, user_id, kb_id, kb_name):
+        query = "UPDATE KnowledgeBase SET kb_name = %s WHERE kb_id = %s AND user_id = %s"
+        self.execute_query_(query, (kb_name, kb_id, user_id), commit=True)
+        return True
+
+    def match_user_name_and_id(self, user_id, user_name):
+        query = "SELECT user_id FROM User WHERE user_id = %s AND user_name = %s"
+        result = self.execute_query_(query, (user_id, user_name), fetch=True)
+        return result
 
 if __name__ == '__main__':
     client = MySQLClient('remote')

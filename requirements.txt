@@ -13,3 +13,4 @@ BCEmbedding
 pymilvus
 paddlepaddle
 paddleocr
+tiktoken
