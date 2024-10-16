@@ -149,11 +149,24 @@ class MySQLClient:
         query = """
             SELECT file_id, File.kb_id, user_id, file_name, file_path
             FROM ORAG.File
-            LEFT JOIN ORAG.KnowledgeBase KB ON File.kb_id = KB.kb_id;
+            LEFT JOIN ORAG.KnowledgeBase KB ON File.kb_id = KB.kb_id
+            WHERE File.deleted = 0 AND File.status = 'waiting';
         """
         results = self.execute_query_(query, (), fetch=True)
 
         return results
+
+    def update_status_into_normal(self, file_id, chunk_size):
+        query = """
+            UPDATE File
+            SET status = 'normal', chunk_size = %s
+            WHERE file_id = %s;
+        """
+        self.execute_query_(query, (chunk_size, file_id), commit=True)
+
+        logging.info("[SUCCESS] File status updated to normal")
+
+        return True
 
 
 if __name__ == '__main__':

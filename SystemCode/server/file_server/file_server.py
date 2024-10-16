@@ -2,8 +2,11 @@ import os
 import logging
 import time
 import numpy as np
-from BCEmbedding import EmbeddingModel
+from paddleocr import PaddleOCR
+from transformers.models.cvt.convert_cvt_original_pytorch_checkpoint_to_pytorch import embeddings
 
+from SystemCode.core.file import File
+from SystemCode.server.model_manager import ModelManager
 from SystemCode.connector.database import mysql_client, milvus_client
 from SystemCode.configs.database import CONNECT_MODE
 
@@ -22,20 +25,11 @@ model_name = "maidalun1020/bce-embedding-base_v1"
 
 
 class FileSystem:
-    def __init__(self):
+    def __init__(self, model_manager: ModelManager):
         self.mysql_client = mysql_client.MySQLClient(CONNECT_MODE)
+        self.ocr_engine = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=False, show_log=True)
         # Initialize the embedding model and move it to the GPU if available
-        try:
-            self.embed_model = EmbeddingModel(model_name_or_path=model_path)
-        except Exception as e:
-            logging.info("Failed to load model from local path, trying to load from Hugging Face")
-            self.embed_model = EmbeddingModel(model_name_or_path=model_name)
-
-    def embedding_file(self, docs) -> np.array:
-        """ get the embedding result of the file"""
-        docs_content = [doc.page_content for doc in docs]
-
-        return self.embed_model.encode(docs_content)
+        self.model_manager = model_manager
 
     def start(self):
         """
@@ -44,9 +38,49 @@ class FileSystem:
         """
         while True:
             # get the file from the database
+            files_not_embedded = self.mysql_client.get_file_not_embedded()
+            if not files_not_embedded:
+                logging.info("No file needs to be embedded.")
+                time.sleep(FILE_SYSTEM_SLEEP_TIME)
+                continue
 
-            # embed the file
+            for file in files_not_embedded:
+                # embed the file
+                if file[3].endswith(".url"):
+                    the_file = File(file_id=file[0], kb_id=file[1], file_name=file[3], file_path=None, url=file[4])
+                else:
+                    the_file = File(file_id=file[0], kb_id=file[1], file_name=file[3], file_path=file[4])
 
-            # save the embedding to the database
+                docs = the_file.split_file(self.ocr_engine)
+                embed = self.model_manager.get_embedding(docs)
+
+                # save the embedding to the database
+                milvus_client_ = milvus_client.MilvusClient(
+                    user_id=file[2],
+                    kb_ids=file[1],
+                    mode=CONNECT_MODE
+                )
+
+                milvus_client_.insert_files_not_async(
+                    file_id=file[0],
+                    file_name=file[3],
+                    file_path=file[4],
+                    embs=embed,
+                    docs=docs
+                )
+                logging.info('[File System] Insert into milvus successfully.')
+
+                self.mysql_client.update_status_into_normal(
+                    file_id=file[0],
+                    chunk_size=len(docs)
+                )
+
+                logging.info('[File System] Update status in Mysql successfully.')
 
             time.sleep(FILE_SYSTEM_SLEEP_TIME)
+
+
+if __name__ == '__main__':
+    model_manager = ModelManager()
+    file_system = FileSystem(model_manager)
+    file_system.start()
