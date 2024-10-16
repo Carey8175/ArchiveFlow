@@ -26,7 +26,7 @@ class MilvusFailed(Exception):
 class MilvusClient:
     def __init__(self, mode, user_id, kb_ids, *, threshold=1.1, client_timeout=3, gpu_enable=False):
         self.user_id = user_id
-        self.kb_ids = kb_ids
+        self.kb_ids = kb_ids if isinstance(kb_ids, list) else [kb_ids]
         if mode == 'local':
             self.host = MYSQL_LOCAL_HOST
         else:
@@ -36,7 +36,7 @@ class MilvusClient:
         self.password = MILVUS_PASSWORD
         self.db_name = MILVUS_DB_NAME
         self.client_timeout = client_timeout
-        self.threshold = threshold
+        self.threshold = threshold      # milvus search threshold, below this value will be returned
         self.sess: Collection = None
         self.partitions: List[Partition] = []
         self.executor = ThreadPoolExecutor(max_workers=10)
@@ -115,6 +115,7 @@ class MilvusClient:
             logging.error(e)
 
     def __search_emb_sync(self, embs, expr='', top_k=None, client_timeout=None, queries=None):
+        # 此方法会自动去连接上下文，范围是前后200 chunk_id，默认值搜索，没有重排序，重排需要重新写函数
         if not top_k:
             top_k = self.top_k
         milvus_records = self.sess.search(data=embs, partition_names=self.kb_ids, anns_field="embedding",

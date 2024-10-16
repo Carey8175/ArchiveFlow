@@ -216,6 +216,16 @@ class MySQLClient:
         logging.info("add_file: {}".format(file_id))
         return file_id, "success"
 
+    def delete_knowledge_base(self, user_id, kb_id):
+        query = "UPDATE KnowledgeBase SET deleted = 1 WHERE kb_id = %s AND user_id = %s"
+        self.execute_query_(query, (kb_id, user_id), commit=True)
+        return True
+
+    def list_knowledge_base(self, user_id):
+        query = "SELECT kb_id, kb_name FROM KnowledgeBase WHERE user_id = %s AND deleted = 0"
+        result = self.execute_query_(query, (user_id,), fetch=True)
+        return result
+
 
 if __name__ == '__main__':
     client = MySQLClient('remote')

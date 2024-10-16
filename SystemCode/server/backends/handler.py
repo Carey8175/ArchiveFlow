@@ -66,6 +66,96 @@ async def new_knowledge_base(req: sanic_request):
                        "data": {"kb_id": kb_id, "kb_name": kb_name, "timestamp": timestamp}})
 
 
+async def list_knowledge_base(req: sanic_request):
+    """
+    user_id
+    :param req:
+    :return:
+    """
+    user_id = safe_get(req, 'user_id')
+    if type(user_id) == list:
+        user_id = user_id[0]
+
+    logging.info("[API]-[list knowledge base] user_id: %s", user_id)
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'[user_id]输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+
+    kbs = mysql_client.list_knowledge_base(user_id)
+    return sanic_json({"code": 200, "msg": "success", "data": kbs})
+
+
+async def delete_knowledge_base(req: sanic_request):
+    """
+    user_id, kb_id
+    delete knowledge base for user, delete from milvus, mysql
+    """
+    user_id = safe_get(req, 'user_id')
+    if type(user_id) == list:
+        user_id = user_id[0]
+
+    logging.info("[API]-[delete knowledge base] user_id: %s", user_id)
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'[user_id]输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+
+    kb_id = safe_get(req, 'kb_id')
+    if kb_id is None:
+        return sanic_json({"code": 2002, "msg": f'[kb_id]输入非法！request.json：{req.json}，请检查！'})
+
+    # validate the kb_id
+    invalid_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
+    if invalid_kb_ids:
+        return sanic_json({"code": 2001, "msg": f'invalid kb_id: {invalid_kb_ids}, please check...'})
+
+    mysql_client.delete_knowledge_base(user_id, kb_id)
+    return sanic_json({"code": 200, "msg": "success delete knowledge base {}".format(kb_id)})
+
+
+# --------------------------- User ---------------------------
+async def add_new_user(req: sanic_request):
+    """
+    user_name
+    add new user into mysql
+    """
+    user_name = safe_get(req, 'user_name')
+    if user_name is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    # generate user_id
+    user_id = uuid.uuid4().hex
+
+    mysql_client.add_user_(user_id, user_name)
+
+    return sanic_json({"code": 200, "msg": "success add user, id: {}".format(user_id)})
+
+
+async def get_user_id_by_name(req: sanic_request):
+    """
+    user_name
+
+    get user_id by user_name
+    :param req:
+    :return:
+    """
+    user_name = safe_get(req, 'user_name')
+    if user_name is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    sql = "SELECT user_id FROM User WHERE user_name = %s"
+    result = mysql_client.execute_query_(sql, (user_name,), fetch=True)
+    if not result:
+        return sanic_json({"code": 2001, "msg": f'无法找到用户{user_name}，请检查！'})
+
+    user_id = result[0][0]
+
+    return sanic_json({"code": 200, "msg": "success", "data": {"user_id": user_id}})
+
+
 async def upload_files(req: sanic_request):
     user_id = safe_get(req, 'user_id')
     if user_id is None:
