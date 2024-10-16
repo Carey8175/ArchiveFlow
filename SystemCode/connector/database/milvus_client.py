@@ -1,4 +1,3 @@
-from joblib.externals.cloudpickle import instance
 from pymilvus import connections, FieldSchema, CollectionSchema, DataType, Collection, utility, \
     Partition
 from concurrent.futures import ThreadPoolExecutor, as_completed

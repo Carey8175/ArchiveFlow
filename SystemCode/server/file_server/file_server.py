@@ -1,9 +1,7 @@
 import os
 import logging
 import time
-import numpy as np
 from paddleocr import PaddleOCR
-from transformers.models.cvt.convert_cvt_original_pytorch_checkpoint_to_pytorch import embeddings
 
 from SystemCode.core.file import File
 from SystemCode.server.model_manager import ModelManager
