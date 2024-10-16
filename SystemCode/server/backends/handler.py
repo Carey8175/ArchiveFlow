@@ -289,7 +289,7 @@ async def update_user_name(req: sanic_request):
     return sanic_json({"code": 200, "msg": "success update user name"})
 
 
-async def log_in(req: sanic_request):
+async def login(req: sanic_request):
     """
     user_name
     log in
