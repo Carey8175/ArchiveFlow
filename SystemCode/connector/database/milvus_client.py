@@ -26,7 +26,7 @@ class MilvusFailed(Exception):
 class MilvusClient:
     def __init__(self, mode, user_id, kb_ids, *, threshold=1.1, client_timeout=3, gpu_enable=False):
         self.user_id = user_id
-        self.kb_ids = kb_ids
+        self.kb_ids = kb_ids if type(kb_ids) is list else [kb_ids]
         if mode == 'local':
             self.host = MYSQL_LOCAL_HOST
         else:
@@ -141,6 +141,41 @@ class MilvusClient:
             partial(self.sess.query, partition_names=self.kb_ids, output_fields=output_fields, expr=expr,
                     timeout=client_timeout))
         return future.result()
+
+
+    def insert_files_not_async(self, file_id, file_name, file_path, docs, embs, batch_size=1000):
+        logging.info(f'[ FILE ]now insert_file {file_name}')
+        now = datetime.now()
+        timestamp = now.strftime("%Y%m%d%H%M")
+        # loop = asyncio.get_running_loop()
+        contents = [doc.page_content for doc in docs]
+        num_docs = len(docs)
+        for batch_start in range(0, num_docs, batch_size):
+            batch_end = min(batch_start + batch_size, num_docs)
+            data = [[] for _ in range(len(self.sess.schema))]
+
+            for idx in range(batch_start, batch_end):
+                cont = contents[idx]
+                emb = embs[idx]
+                chunk_id = f'{file_id}_{idx}'
+                data[0].append(chunk_id)
+                data[1].append(file_id)
+                data[2].append(file_name)
+                data[3].append(file_path)
+                data[4].append(timestamp)
+                data[5].append(cont)
+                data[6].append(emb)
+
+            # 执行插入操作
+            try:
+                logging.info('Inserting into Milvus...')
+                mr = self.partitions[0].insert(data=data)
+                logging.info(f'{file_name} {mr}')
+            except Exception as e:
+                logging.error(f'Milvus insert file_id:{file_id}, file_name:{file_name} failed: {e}')
+                return False
+
+        return True
 
     async def insert_files(self, file_id, file_name, file_path, docs, embs, batch_size=1000):
         logging.info(f'[ FILE ]now insert_file {file_name}')

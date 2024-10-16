@@ -4,7 +4,7 @@ import requests
 from typing import Optional, Set, List, Any
 from urllib.parse import urljoin, urldefrag
 from bs4 import BeautifulSoup
-from SystemCode.configs.basic import SENTENCE_SIZE, MAX_DEPTH
+from SystemCode.configs.basic import SENTENCE_SIZE, MAX_URL_DEPTH
 from unstructured.partition.text import partition_text
 from langchain_community.document_loaders import UnstructuredFileLoader
 
@@ -33,7 +33,13 @@ class URLToTextConverter(UnstructuredFileLoader):
         """ """
         try:
             # Fetch the content of the URL
-            response = requests.get(url)
+            headers = {
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
+
+            }
+
+            response = requests.get(url, headers=headers)
             if response.status_code != 200:
                 print(f"Failed to retrieve URL: {url} (Status code: {response.status_code})")
                 return None
@@ -70,7 +76,7 @@ class URLToTextConverter(UnstructuredFileLoader):
                 soup = BeautifulSoup(response.text, "html.parser")
                 child_links = self._get_child_links(soup, url)
 
-                for link in child_links[:MAX_DEPTH]:
+                for link in child_links[:MAX_URL_DEPTH]:
                     print('parser url :', link)
                     combined_text += self.get_url_content(link)
 
