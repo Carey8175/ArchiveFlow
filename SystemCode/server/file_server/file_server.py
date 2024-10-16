@@ -4,6 +4,7 @@ import time
 import numpy as np
 from BCEmbedding import EmbeddingModel
 
+from SystemCode.server.models.model_manager import ModelManager
 from SystemCode.connector.database import mysql_client, milvus_client
 from SystemCode.configs.database import CONNECT_MODE
 
@@ -22,7 +23,7 @@ model_name = "maidalun1020/bce-embedding-base_v1"
 
 
 class FileSystem:
-    def __init__(self):
+    def __init__(self, model_manager: ModelManager):
         self.mysql_client = mysql_client.MySQLClient(CONNECT_MODE)
         # Initialize the embedding model and move it to the GPU if available
         try:
