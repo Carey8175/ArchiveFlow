@@ -228,7 +228,7 @@ class MySQLClient:
         not_exist_kb_ids = self.check_kb_exist(user_id, [kb_id])
         if not_exist_kb_ids:
             return None, f"invalid kb_id, please check {not_exist_kb_ids}"
-        file_id = uuid.uuid4().hex
+        file_id = 'F'+ uuid.uuid4().hex
         query = "INSERT INTO File (file_id, kb_id, file_name, status, timestamp, file_size, file_path) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         self.execute_query_(query, (file_id, kb_id, file_name, status, timestamp, file_size, file_path), commit=True)
         logging.info("add_file: {}".format(file_id))
@@ -249,20 +249,30 @@ class MySQLClient:
         self.execute_query_(query, (new_user_name, user_id, user_name), commit=True, fetch=True)
         return True
 
-    def update_knowledge_base_name(self, user_id, kb_id, new_kb_name):
-        query = "UPDATE KnowledgeBase SET kb_name = %s WHERE kb_id = %s AND user_id = %s"
-        self.execute_query_(query, (new_kb_name, kb_id, user_id), commit=True)
-        return True
-
     def match_user_name_and_id(self, user_id, user_name):
         query = "SELECT user_id FROM User WHERE user_id = %s AND user_name = %s"
         result = self.execute_query_(query, (user_id, user_name), fetch=True)
         return result
 
-    def check_kb_exist_by_name(self, user_id, kb_id, kb_name):
-        query = "SELECT kb_id FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s AND kb_id = %s"
-        result = self.execute_query_(query, (kb_name, user_id, kb_id), fetch=True)
-        return result
+    # def check_kb_exist_by_name(self, user_id, new_kb_name):
+    #     query = "SELECT kb_name FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s"
+    #     result = self.execute_query_(query, (new_kb_name, user_id), fetch=True)
+    #     return result
+
+    def check_kb_exist_by_name(self, user_id, new_kb_name):
+        query = "SELECT 1 FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s"
+        result = self.execute_query_(query, (new_kb_name, user_id), fetch=True)
+        return bool(result)
+
+    def update_knowledge_base_name(self, user_id, kb_id, new_kb_name):
+        query = "UPDATE KnowledgeBase SET kb_name = %s WHERE kb_id = %s AND user_id = %s"
+        self.execute_query_(query, (new_kb_name, kb_id, user_id), commit=True)
+        return True
+
+    # def check_kb_name_exists(self, user_id, kb_name):
+    #     query = "SELECT 1 FROM KnowledgeBase WHERE user_id = %s AND kb_name = %s LIMIT 1"
+    #     result = self.execute_query_(query, (user_id, kb_name))
+    #     return result is not None and len(result) > 0
 
 if __name__ == '__main__':
     client = MySQLClient('remote')

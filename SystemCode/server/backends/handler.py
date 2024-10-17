@@ -43,6 +43,7 @@ async def new_knowledge_base(req: sanic_request):
     user_id, new_kb_name
     create new knowledge base for user, insert into milvus, mysql
     """
+    # input
     user_id = safe_get(req, 'user_id')
     if type(user_id) == list:
         user_id = user_id[0]
@@ -54,11 +55,19 @@ async def new_knowledge_base(req: sanic_request):
     if not is_valid:
         return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
     logging.info("new_knowledge_base %s", user_id)
+
     kb_name = safe_get(req, 'kb_name')
     if kb_name is None:
         return sanic_json({"code": 2002, "msg": f'[kb_name]输入非法！request.json：{req.json}，请检查！'})
 
+    # check
+    existing_kb = mysql_client.check_kb_exist_by_name(user_id, kb_name)
+    if existing_kb:
+        return sanic_json({"code": 2006, "msg": f'知识库名称 "{kb_name}" 已经存在，请使用不同的名称！'})
+
+    # generate
     kb_id = 'KB' + uuid.uuid4().hex
+
     mysql_client.create_milvus_collection(kb_id, user_id, kb_name)
     now = datetime.now()
     timestamp = now.strftime("%Y%m%d%H%M")
@@ -118,13 +127,12 @@ async def delete_knowledge_base(req: sanic_request):
 
 async def update_knowledge_base_name(req: sanic_request):
     """
-    user_id, kb_id, kb_name, new_kb_name
+    user_id, kb_id, new_kb_name
     update knowledge base name
     """
     user_id = safe_get(req, 'user_id')
     if type(user_id) == list:
         user_id = user_id[0]
-
     logging.info("[API]-[update knowledge base name] user_id: %s", user_id)
     if user_id is None:
         return sanic_json({"code": 2002, "msg": f'[user_id]输入非法！request.json：{req.json}，请检查！'})
@@ -136,18 +144,15 @@ async def update_knowledge_base_name(req: sanic_request):
     if kb_id is None:
         return sanic_json({"code": 2002, "msg": f'[kb_id]输入非法！request.json：{req.json}，请检查！'})
 
-    kb_name = safe_get(req, 'kb_name')
-    if kb_name is None:
-        return sanic_json({"code": 2002, "msg": f'[kb_name]输入非法！request.json：{req.json}，请检查！'})
-
-    if mysql_client.check_kb_exist_by_name(user_id, kb_id, kb_name):
-        return sanic_json({"code": 2001, "msg": f'kb名重复'})
-
     new_kb_name = safe_get(req, 'new_kb_name')
     if new_kb_name is None:
         return sanic_json({"code": 2002, "msg": f'[new_kb_name]输入非法！request.json：{req.json}，请检查'})
 
+    if mysql_client.check_kb_exist_by_name(user_id, new_kb_name):
+        return sanic_json({"code": 2001, "msg": f'kb名重复'})
+
     mysql_client.update_knowledge_base_name(user_id, kb_id, new_kb_name)
+
     return sanic_json({"code": 200, "msg": "success update knowledge base name"})
 
 
@@ -166,7 +171,7 @@ async def add_new_user(req: sanic_request):
     user_id = 'U' + uuid.uuid4().hex
 
     mysql_client.add_user_(user_id, user_name)
-
+    logging.info("[API]-[add new user] user_id: %s", user_id)
     return sanic_json({"code": 200, "msg": "success add user, id: {}".format(user_id), "user_id":user_id})
 
 
@@ -182,6 +187,8 @@ async def get_user_id_by_name(req: sanic_request):
     if user_name is None:
         return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
 
+    logging.info("[API]-[get user id by name] user_name: %s", user_name)
+
     sql = "SELECT user_id FROM User WHERE user_name = %s"
     result = mysql_client.execute_query_(sql, (user_name,), fetch=True)
     if not result:
@@ -193,13 +200,18 @@ async def get_user_id_by_name(req: sanic_request):
 
 
 async def upload_files(req: sanic_request):
+    """
+    user_id, kb_id, files, mode
+    upload files
+    """
     user_id = safe_get(req, 'user_id')
     if user_id is None:
         return sanic_json({"code": 2002, "msg": f'输入非法！request.form: {req.form}，request.files: {req.files}请检查！'})
     is_valid = validate_user_id(user_id)
     if not is_valid:
         return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
-    logging.info("upload_files %s", user_id)
+    logging.info("[API]-[upload file] user_id: %s", user_id)
+
     kb_id = safe_get(req, 'kb_id')
 
     mode = safe_get(req, 'mode', default='soft')  # soft代表不上传同名文件，strong表示强制上传同名文件
@@ -244,19 +256,26 @@ async def upload_files(req: sanic_request):
         if file_name in exist_file_names:
             continue
         file_size = len(file.body)
-        file_path = os.path.join(FILES_PATH, file_name)
+        file_path = os.path.join(FILES_PATH, kb_id, file_name)
+        if not os.path.exists(os.path.join(FILES_PATH, kb_id)):
+            os.makedirs(os.path.join(FILES_PATH, kb_id))
+
+        # save file
+        with open(file_path, 'wb') as f:
+            f.write(file.body)
+
         file_id, msg = mysql_client.add_file(user_id, kb_id, file_name, timestamp, file_size, file_path)
         logging.info(f"{file_name}, {file_id}, {msg}")
         data.append(
-            {"file_id": file_id, "file_name": file_name, "status": "gray", "bytes": file_size,
+            {"file_id": file_id, "file_name": file_name, "status": "waiting", "bytes(KB)": file_size // (8 * 1024),
              "timestamp": timestamp})
 
     if exist_file_names:
         msg = f'warning，当前的mode是soft，无法上传同名文件{exist_file_names}，如果想强制上传同名文件，请设置mode：strong'
+        return sanic_json({"code": 2001, "msg": msg, "data": data})
     else:
         msg = "success，后台正在飞速上传文件，请耐心等待"
-
-    return sanic_json({"code": 200, "msg": msg, "data": data})
+        return sanic_json({"code": 200, "msg": msg, "data": data})
 
 
 async def update_user_name(req: sanic_request):
@@ -272,7 +291,7 @@ async def update_user_name(req: sanic_request):
     is_valid = validate_user_id(user_id)
     if not is_valid:
         return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
-    logging.info("update_user_name %s", user_id)
+    logging.info("[API]-[update user name] user_id: %s", user_id)
 
     user_name = safe_get(req, 'user_name')
     if not user_name:
@@ -309,4 +328,5 @@ async def login(req: sanic_request):
     result = mysql_client.execute_query_(sql, (user_name,), fetch=True)
     user_id = result[0][0]
 
+    logging.info("[API]-[login] user_id: %s", user_id)
     return sanic_json({"code": 200, "msg": "success log in", "status": True, "user_id": user_id})
