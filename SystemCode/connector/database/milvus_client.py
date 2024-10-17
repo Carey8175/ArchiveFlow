@@ -7,12 +7,13 @@ import time
 import copy
 from datetime import datetime
 from SystemCode.configs.database import MYSQL_LOCAL_HOST, MYSQL_REMOTE_HOST, MILVUS_PORT, MILVUS_USER, \
-    MILVUS_PASSWORD, MILVUS_DB_NAME, CHUNK_SIZE, VECTOR_SEARCH_TOP_K
+    MILVUS_PASSWORD, MILVUS_DB_NAME, CHUNK_SIZE, VECTOR_SEARCH_TOP_K, VECTOR_SEARCH_TOP_K_RERANK
 from langchain.docstore.document import Document
 import math
 import logging
 from itertools import groupby
 from typing import List
+from SystemCode.server.model_manager import ModelManager
 
 # ----------------- Logger -----------------
 logging.basicConfig(level='INFO', format='%(asctime)s - %(levelname)s - %(message)s')
@@ -24,7 +25,7 @@ class MilvusFailed(Exception):
 
 
 class MilvusClient:
-    def __init__(self, mode, user_id, kb_ids, *, threshold=1.1, client_timeout=3, gpu_enable=False):
+    def __init__(self, mode, user_id, kb_ids, *, threshold=0.475, client_timeout=3, gpu_enable=False):
         self.user_id = user_id
         self.kb_ids = kb_ids if type(kb_ids) is list else [kb_ids]
         if mode == 'local':
@@ -36,11 +37,12 @@ class MilvusClient:
         self.password = MILVUS_PASSWORD
         self.db_name = MILVUS_DB_NAME
         self.client_timeout = client_timeout
-        self.threshold = threshold
+        self.threshold = threshold      # use to filter the search result, default is 0.475, rerank score
         self.sess: Collection = None
         self.partitions: List[Partition] = []
         self.executor = ThreadPoolExecutor(max_workers=10)
         self.top_k = VECTOR_SEARCH_TOP_K
+        self.top_k_rerank = VECTOR_SEARCH_TOP_K_RERANK
         self.search_params = {"metric_type": "L2", "params": {"nprobe": 256}}
         if not gpu_enable:
             self.create_params = {"metric_type": "L2", "index_type": "IVF_FLAT", "params": {"nlist": 2048}}
@@ -66,10 +68,11 @@ class MilvusClient:
         new_result = []
         for batch_idx, result in enumerate(batch_result):
             new_cands = []
-            result.sort(key=lambda x: x.score)
-            valid_results = [cand for cand in result if cand.score <= self.threshold]
-            if len(valid_results) == 0:  # 如果没有合适的结果，就取topk
-                valid_results = result[:self.top_k]
+            result.sort(key=lambda x: x.score, reverse=True)
+            valid_results = [cand for cand in result if cand.score >= self.threshold]
+            if len(valid_results) == 0 or len(valid_results) > self.top_k_rerank:  # 如果没有合适的结果或者结果大于topk，就取topk
+                valid_results = result[:self.top_k_rerank]
+
             for cand_i, cand in enumerate(valid_results):
                 doc = Document(page_content=cand.entity.get('content'),
                                metadata={"score": cand.score, "file_id": cand.entity.get('file_id'),
@@ -114,22 +117,35 @@ class MilvusClient:
         except Exception as e:
             logging.error(e)
 
-    def __search_emb_sync(self, embs, expr='', top_k=None, client_timeout=None, queries=None):
+    def __search_emb_sync(self, embs, expr='', model_manager: ModelManager = None, top_k=None, client_timeout=None, queries=None):
         if not top_k:
             top_k = self.top_k
         milvus_records = self.sess.search(data=embs, partition_names=self.kb_ids, anns_field="embedding",
                                           param=self.search_params, limit=top_k,
                                           output_fields=self.output_fields, expr=expr, timeout=client_timeout)
+
+        # 2nd retrival
+        if model_manager and queries:
+            # rerank for each query
+            for query, record in zip(queries, milvus_records):
+                rerank_results = model_manager.rerank(query, [hit.entity.get('content') for hit in record])
+                # change distance to score, and update the record
+                # due to shared memory, the record will be updated in the milvus_records
+                for score, qid in zip(rerank_results['rerank_scores'], rerank_results['rerank_ids']):
+                    record[qid].distance = score
+
         milvus_records_proc = self.parse_batch_result(milvus_records)
         # debug_logger.info(milvus_records)
 
         return milvus_records_proc
 
-    def search_emb_async(self, embs, expr='', top_k=None, client_timeout=None, queries=None):
+    def search_emb_async(self, embs, expr='', model_manager: ModelManager = None, top_k=None, client_timeout=None,
+                         queries=None):
         if not top_k:
             top_k = self.top_k
         # 将search_emb_sync函数放入线程池中运行
-        future = self.executor.submit(self.__search_emb_sync, embs, expr, top_k, client_timeout, queries)
+        future = self.executor.submit(self.__search_emb_sync, embs, expr, model_manager, top_k, client_timeout,
+                                      [queries] if isinstance(queries, str) else queries)
         return future.result()
 
     def query_expr_async(self, expr, output_fields=None, client_timeout=None):
@@ -141,7 +157,6 @@ class MilvusClient:
             partial(self.sess.query, partition_names=self.kb_ids, output_fields=output_fields, expr=expr,
                     timeout=client_timeout))
         return future.result()
-
 
     def insert_files_not_async(self, file_id, file_name, file_path, docs, embs, batch_size=1000):
         logging.info(f'[ FILE ]now insert_file {file_name}')
@@ -361,6 +376,7 @@ if __name__ == '__main__':
     embeddings = embed_model.encode([doc.page_content for doc in docs])
 
     import numpy as np
+
     # np.save('embeddings.npy', embeddings)
     # embeddings = np.load('embeddings.npy')
 
