@@ -1,7 +1,7 @@
 import sys
 from SystemCode.configs.basic import *
 
-from handler import *
+from SystemCode.server.backends.handler import *
 from sanic import Sanic
 from sanic import response as sanic_response
 import argparse
@@ -66,7 +66,7 @@ app.add_route(get_user_id_by_name, "/api/orag/select/user_id", methods=['POST'])
 
 # update ------------------------------------------------------------------------------------------------
 app.add_route(update_user_name, "/api/orag/update/user_name", methods=['POST'])  # tags=["更新用户名"]
-app.add_route(update_knowledge_base_name, "/api/orag/update/knowledge_base_name", methods=['POST'])  # tags=["更新知识库名"]
+app.add_route(update_knowledge_base_name, "/api/orag/update/kb_name", methods=['POST'])  # tags=["更新知识库名"]
 
 # search ------------------------------------------------------------------------------------------------
 app.add_route(login, "/api/orag/search/login", methods=['POST'])  # tags=["登录"]

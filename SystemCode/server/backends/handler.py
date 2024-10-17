@@ -40,7 +40,7 @@ def init_folders():
 
 async def new_knowledge_base(req: sanic_request):
     """
-    user_id, new_knowledge_base_name
+    user_id, new_kb_name
     create new knowledge base for user, insert into milvus, mysql
     """
     user_id = safe_get(req, 'user_id')
@@ -118,7 +118,7 @@ async def delete_knowledge_base(req: sanic_request):
 
 async def update_knowledge_base_name(req: sanic_request):
     """
-    user_id, kb_id, kb_name
+    user_id, kb_id, kb_name, new_kb_name
     update knowledge base name
     """
     user_id = safe_get(req, 'user_id')
@@ -140,12 +140,14 @@ async def update_knowledge_base_name(req: sanic_request):
     if kb_name is None:
         return sanic_json({"code": 2002, "msg": f'[kb_name]输入非法！request.json：{req.json}，请检查！'})
 
-    # validate the kb_id
-    invalid_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
-    if invalid_kb_ids:
-        return sanic_json({"code": 2001, "msg": f'invalid kb_id: {invalid_kb_ids}, please check...'})
+    if mysql_client.check_kb_exist_by_name(user_id, kb_id, kb_name):
+        return sanic_json({"code": 2001, "msg": f'kb名重复'})
 
-    mysql_client.update_knowledge_base_name(user_id, kb_id, kb_name)
+    new_kb_name = safe_get(req, 'new_kb_name')
+    if new_kb_name is None:
+        return sanic_json({"code": 2002, "msg": f'[new_kb_name]输入非法！request.json：{req.json}，请检查'})
+
+    mysql_client.update_knowledge_base_name(user_id, kb_id, new_kb_name)
     return sanic_json({"code": 200, "msg": "success update knowledge base name"})
 
 
@@ -158,13 +160,14 @@ async def add_new_user(req: sanic_request):
     user_name = safe_get(req, 'user_name')
     if user_name is None:
         return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
-
+    if mysql_client.check_user_exist_by_name(user_name):
+        return sanic_json({"code": 2001, "msg": f'用户名{user_name}已存在，请更换！'})
     # generate user_id
     user_id = 'U' + uuid.uuid4().hex
 
     mysql_client.add_user_(user_id, user_name)
 
-    return sanic_json({"code": 200, "msg": "success add user, id: {}".format(user_id)})
+    return sanic_json({"code": 200, "msg": "success add user, id: {}".format(user_id), "user_id":user_id})
 
 
 async def get_user_id_by_name(req: sanic_request):
@@ -306,4 +309,4 @@ async def login(req: sanic_request):
     result = mysql_client.execute_query_(sql, (user_name,), fetch=True)
     user_id = result[0][0]
 
-    return sanic_json({"code": 200, "msg": "success log in", "status": True, "data": {"user_id": user_id}})
+    return sanic_json({"code": 200, "msg": "success log in", "status": True, "user_id": user_id})

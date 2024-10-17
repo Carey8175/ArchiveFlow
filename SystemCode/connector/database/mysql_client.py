@@ -2,7 +2,6 @@ import logging
 import time
 import uuid
 import pymysql
-from SystemCode.connector.database.mysql_pool import MySQLThreadPool
 from SystemCode.configs.database import *
 from SystemCode.configs.basic import LOG_LEVEL
 
@@ -31,7 +30,18 @@ class MySQLClient:
             'database': self.database,
         }
 
-        self.conn_pool = MySQLThreadPool(MAX_CONNECTIONS, db_config=db_config)
+        # self.conn_pool = MySQLThreadPool(MAX_CONNECTIONS, db_config=db_config)
+
+    def get_conn(self):
+        conn = pymysql.connect(
+            host=self.host,
+            port=self.port,
+            user=self.user,
+            password=self.password,
+            database=self.database
+        )
+
+        return conn
 
     def _check_connection(self):
         # connect to mysql
@@ -56,7 +66,8 @@ class MySQLClient:
         conn.close()
 
     def execute_query_(self, query, params, commit=False, fetch=False, many=False):
-        conn = self.conn_pool.get_connection()
+        # conn = self.conn_pool.get_connection()
+        conn = self.get_conn()
         cursor = conn.cursor()
 
         if many:
@@ -73,7 +84,8 @@ class MySQLClient:
             result = None
 
         cursor.close()
-        self.conn_pool.release_connection(conn)
+        # self.conn_pool.release_connection(conn)
+        conn.close()
         logging.info("[SUCCESS] Query executed successfully with sql: {} \n".format(query))
 
         return result
@@ -155,7 +167,7 @@ class MySQLClient:
     def check_user_exist_by_name(self, user_name):
         query = "SELECT user_name FROM User WHERE user_name = %s"
         result = self.execute_query_(query, (user_name,), fetch=True)
-        logging.info("check_user_exist_by_name {}".format(result))
+        logging.info("[check_user_exist_by_name] {}".format(result))
         return result is not None and len(result) > 0
 
     def add_user_(self, user_id, user_name=None):
@@ -237,14 +249,19 @@ class MySQLClient:
         self.execute_query_(query, (new_user_name, user_id, user_name), commit=True, fetch=True)
         return True
 
-    def update_knowledge_base_name(self, user_id, kb_id, kb_name):
+    def update_knowledge_base_name(self, user_id, kb_id, new_kb_name):
         query = "UPDATE KnowledgeBase SET kb_name = %s WHERE kb_id = %s AND user_id = %s"
-        self.execute_query_(query, (kb_name, kb_id, user_id), commit=True)
+        self.execute_query_(query, (new_kb_name, kb_id, user_id), commit=True)
         return True
 
     def match_user_name_and_id(self, user_id, user_name):
         query = "SELECT user_id FROM User WHERE user_id = %s AND user_name = %s"
         result = self.execute_query_(query, (user_id, user_name), fetch=True)
+        return result
+
+    def check_kb_exist_by_name(self, user_id, kb_id, kb_name):
+        query = "SELECT kb_id FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s AND kb_id = %s"
+        result = self.execute_query_(query, (kb_name, user_id, kb_id), fetch=True)
         return result
 
 if __name__ == '__main__':
