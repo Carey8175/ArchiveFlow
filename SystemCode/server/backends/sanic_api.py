@@ -69,7 +69,7 @@ app.add_route(update_user_name, "/api/orag/update/user_name", methods=['POST']) 
 app.add_route(update_knowledge_base_name, "/api/orag/update/kb_name", methods=['POST'])  # tags=["更新知识库名"]
 
 # search ------------------------------------------------------------------------------------------------
-app.add_route(login, "/api/orag/search/login", methods=['POST'])  # tags=["登录"]check
+app.add_route(login, "/api/orag/search/login", methods=['POST'])  # tags=["登录"]checkname
 
 
 #app.add_route(document, "/api/docs", methods=['GET'])
