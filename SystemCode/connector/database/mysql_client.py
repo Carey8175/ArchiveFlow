@@ -269,10 +269,7 @@ class MySQLClient:
         self.execute_query_(query, (new_kb_name, kb_id, user_id), commit=True)
         return True
 
-    # def check_kb_name_exists(self, user_id, kb_name):
-    #     query = "SELECT 1 FROM KnowledgeBase WHERE user_id = %s AND kb_name = %s LIMIT 1"
-    #     result = self.execute_query_(query, (user_id, kb_name))
-    #     return result is not None and len(result) > 0
+
 
 if __name__ == '__main__':
     client = MySQLClient('remote')
