@@ -21,7 +21,7 @@ class Doc:
 
 
 model_manager = ModelManager()
-query = 'Insert'
+query = ['CNN+LSTM', '什么是ISS？']
 emb = model_manager.get_embedding([Doc(query)])
 
 

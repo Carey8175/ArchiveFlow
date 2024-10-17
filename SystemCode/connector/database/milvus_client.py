@@ -25,7 +25,7 @@ class MilvusFailed(Exception):
 
 
 class MilvusClient:
-    def __init__(self, mode, user_id, kb_ids, *, threshold=0.475, client_timeout=3, gpu_enable=False):
+    def __init__(self, mode, user_id, kb_ids, *, threshold=1.1, client_timeout=3, gpu_enable=False):
         self.user_id = user_id
         self.kb_ids = kb_ids if type(kb_ids) is list else [kb_ids]
         if mode == 'local':
@@ -68,10 +68,10 @@ class MilvusClient:
         new_result = []
         for batch_idx, result in enumerate(batch_result):
             new_cands = []
-            result.sort(key=lambda x: x.score, reverse=True)
-            valid_results = [cand for cand in result if cand.score >= self.threshold]
-            if len(valid_results) == 0 or len(valid_results) > self.top_k_rerank:  # 如果没有合适的结果或者结果大于topk，就取topk
-                valid_results = result[:self.top_k_rerank]
+            result.sort(key=lambda x: x.score)
+            valid_results = [cand for cand in result if cand.score <= self.threshold]
+            if len(valid_results) == 0:  # 如果没有合适的结果或者结果大于topk，就取topk
+                valid_results = result[:self.top_k]
 
             for cand_i, cand in enumerate(valid_results):
                 doc = Document(page_content=cand.entity.get('content'),
@@ -124,17 +124,24 @@ class MilvusClient:
                                           param=self.search_params, limit=top_k,
                                           output_fields=self.output_fields, expr=expr, timeout=client_timeout)
 
+        milvus_records_proc = self.parse_batch_result(milvus_records)
+
         # 2nd retrival
         if model_manager and queries:
             # rerank for each query
-            for query, record in zip(queries, milvus_records):
-                rerank_results = model_manager.rerank(query, [hit.entity.get('content') for hit in record])
+            for query, docs in zip(queries, milvus_records_proc):
+                rerank_results = model_manager.rerank(query, [doc.page_content for doc in docs])
                 # change distance to score, and update the record
                 # due to shared memory, the record will be updated in the milvus_records
-                for score, qid in zip(rerank_results['rerank_scores'], rerank_results['rerank_ids']):
-                    record[qid].distance = score
+                for score, pid in zip(rerank_results["rerank_scores"], rerank_results["rerank_ids"]):
+                    docs[pid].metadata["score"] = score
 
-        milvus_records_proc = self.parse_batch_result(milvus_records)
+                # sort by score
+                docs.sort(key=lambda x: x.metadata["score"], reverse=True)
+                if len(docs) > self.top_k_rerank:
+                    docs = docs[:self.top_k_rerank]
+
+
         # debug_logger.info(milvus_records)
 
         return milvus_records_proc
