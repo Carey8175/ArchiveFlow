@@ -213,6 +213,13 @@ async def upload_files(req: sanic_request):
     logging.info("[API]-[upload file] user_id: %s", user_id)
 
     kb_id = safe_get(req, 'kb_id')
+    kb_id = kb_id[0] if type(kb_id) == list else kb_id
+    if kb_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    not_exist_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
+    if not_exist_kb_ids:
+        msg = "invalid kb_id: {}, please check...".format(not_exist_kb_ids)
+        return sanic_json({"code": 2001, "msg": msg, "data": [{}]})
 
     mode = safe_get(req, 'mode', default='soft')  # soft代表不上传同名文件，strong表示强制上传同名文件
     logging.info("mode: %s", mode)
@@ -221,11 +228,6 @@ async def upload_files(req: sanic_request):
         files = read_files_with_extensions()
     else:
         files = req.files.getlist('files')
-
-    not_exist_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
-    if not_exist_kb_ids:
-        msg = "invalid kb_id: {}, please check...".format(not_exist_kb_ids)
-        return sanic_json({"code": 2001, "msg": msg, "data": [{}]})
 
     data = []
     local_files = []
@@ -278,6 +280,51 @@ async def upload_files(req: sanic_request):
         return sanic_json({"code": 200, "msg": msg, "data": data})
 
 
+async def upload_url(req: sanic_request):
+    """
+    user_id, kb_id, url
+    upload url
+    """
+    user_id = safe_get(req, 'user_id')
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.form: {req.form}，request.files: {req.files}请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+    logging.info("[API]-[upload file] user_id: %s", user_id)
+
+    kb_id = safe_get(req, 'kb_id')
+    kb_id = kb_id[0] if type(kb_id) == list else kb_id
+    if kb_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    not_exist_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
+    if not_exist_kb_ids:
+        msg = "invalid kb_id: {}, please check...".format(not_exist_kb_ids)
+        return sanic_json({"code": 2001, "msg": msg, "data": [{}]})
+
+    mode = safe_get(req, 'mode', default='soft')  # soft代表不上传同名文件，strong表示强制上传同名文件
+    logging.info("mode: %s", mode)
+
+    url = safe_get(req, 'url')
+    if not url:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    if mysql_client.check_url_exist(kb_id, url):
+        return sanic_json({"code": 2001, "msg": f'当前url已存在，请检查！'})
+
+    now = datetime.now()
+    timestamp = now.strftime("%Y%m%d%H%M")
+    data = []
+    file_id, msg = mysql_client.add_file(user_id, kb_id, url +'.url', timestamp, '-1', url)
+    logging.info(f"{url}, {file_id}, {msg}")
+    data.append(
+        {"file_id": file_id, "file_name": url + '.url', "status": "waiting", "bytes(KB)": '-1',
+         "timestamp": timestamp})
+
+    msg = "success，链接加载中，请耐心等待"
+    return sanic_json({"code": 200, "msg": msg, "data": data})
+
+
 async def check_file_list(req: sanic_request):
     """
     user_id, kb_id
@@ -292,6 +339,7 @@ async def check_file_list(req: sanic_request):
     logging.info("[API]-[check file list] user_id: %s", user_id)
 
     kb_id = safe_get(req, 'kb_id')
+    kb_id = kb_id[0] if type(kb_id) == list else kb_id
     if kb_id is None:
         return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
     not_exist_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
@@ -299,11 +347,38 @@ async def check_file_list(req: sanic_request):
         msg = "invalid kb_id: {}, please check...".format(not_exist_kb_ids)
         return sanic_json({"code": 2001, "msg": msg, "data": [{}]})
 
-
-
-
-    files = mysql_client.check_file_exist(user_id, kb_id)
+    files = mysql_client.select_file_list_by_kb_id(kb_id)
     return sanic_json({"code": 200, "msg": "success", "data": files})
+
+
+async def delete_file(req: sanic_request):
+    """
+    user_id, kb_id，file_id
+    delete file
+    """
+    user_id = safe_get(req, 'user_id')
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+    logging.info("[API]-[delete file] user_id: %s", user_id)
+
+    kb_id = safe_get(req, 'kb_id')
+    kb_id = kb_id[0] if type(kb_id) == list else kb_id
+    if kb_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    not_exist_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
+    if not_exist_kb_ids:
+        msg = "invalid kb_id: {}, please check...".format(not_exist_kb_ids)
+        return sanic_json({"code": 2001, "msg": msg, "data": [{}]})
+
+    file_id = safe_get(req, 'file_id')
+    if file_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    mysql_client.delete_file(user_id, kb_id, file_id)
+    return sanic_json({"code": 200, "msg": "success delete file"})
 
 
 async def update_user_name(req: sanic_request):

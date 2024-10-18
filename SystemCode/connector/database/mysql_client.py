@@ -190,7 +190,7 @@ class MySQLClient:
     def check_kb_exist(self, user_id, kb_ids) -> list:
         # 使用参数化查询
         query = "SELECT kb_id FROM KnowledgeBase WHERE kb_id IN ({}) AND deleted = 0 AND user_id = %s"
-        query = self.placeholders(query,kb_ids)
+        query = self.placeholders(query, kb_ids)
         query_params = kb_ids + [user_id]
         result = self.execute_query_(query, query_params, fetch=True)
         logging.info("check_kb_exist {}".format(result))
@@ -254,11 +254,6 @@ class MySQLClient:
         result = self.execute_query_(query, (user_id, user_name), fetch=True)
         return result
 
-    # def check_kb_exist_by_name(self, user_id, new_kb_name):
-    #     query = "SELECT kb_name FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s"
-    #     result = self.execute_query_(query, (new_kb_name, user_id), fetch=True)
-    #     return result
-
     def check_kb_exist_by_name(self, user_id, new_kb_name):
         query = "SELECT 1 FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s"
         result = self.execute_query_(query, (new_kb_name, user_id), fetch=True)
@@ -268,6 +263,30 @@ class MySQLClient:
         query = "UPDATE KnowledgeBase SET kb_name = %s WHERE kb_id = %s AND user_id = %s"
         self.execute_query_(query, (new_kb_name, kb_id, user_id), commit=True)
         return True
+
+    #return file information include file_id, file_name, file_size, status, file_path, timestamp, chunk_size while deleted = 0
+    def select_file_list_by_kb_id(self, kb_id):
+        query = "SELECT * FROM File WHERE kb_id = %s AND deleted = 0"
+
+        result = self.execute_query_(query, (kb_id, ), fetch=True)
+
+        return result
+
+    # def check_file_exist(self, user_id, kb_id, file_id):
+    #     query = "SELECT 1 FROM File WHERE file_id = %s AND kb_id = %s AND kb_id IN (SELECT kb_id FROM KnowledgeBase WHERE user_id = %s)"
+    #     result = self.execute_query_(query, (file_id, kb_id, user_id), fetch=True)
+    #     return bool(result)
+
+    def check_url_exist(self, kb_id, url):
+        query = "SELECT 1 FROM File WHERE kb_id = %s AND file_path = %s"
+        result = self.execute_query_(query, (kb_id, url), fetch=True)
+        return bool(result)
+
+    def delete_file(self, user_id, kb_id, file_id):
+        query = "UPDATE File SET deleted = 1 WHERE file_id = %s AND kb_id = %s AND kb_id IN (SELECT kb_id FROM KnowledgeBase WHERE user_id = %s)"
+        self.execute_query_(query, (file_id, kb_id, user_id), commit=True)
+        return True
+
 
 
 

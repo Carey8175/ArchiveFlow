@@ -54,15 +54,18 @@ app.add_route(add_new_user, "/api/orag/add/user", methods=['POST'])  # tags=["�
 app.add_route(new_knowledge_base, "/api/orag/add/knowledge_base", methods=['POST'])  # tags=["新建知识库"]
 # document
 app.add_route(upload_files, "/api/orag/add/document", methods=['POST'])  # tags=["上传文件"]
+app.add_route(upload_url, "/api/orag/add/url", methods=['POST'])  # tags=["上传网页链接"]
 
 # delete ------------------------------------------------------------------------------------------------
 app.add_route(delete_knowledge_base, "/api/orag/delete/knowledge_base", methods=['POST'])  # tags=["删除知识库"]
+app.add_route(delete_file, "/api/orag/delete/file", methods=['POST'])  # tags=["删除文件"]
 # app.add_route(delete_docs, "/api/orag/delete/document", methods=['POST'])  # tags=["删除文件"]
 
 # select ------------------------------------------------------------------------------------------------
 app.add_route(list_knowledge_base, "/api/orag/select/knowledge_base", methods=['POST'])  # tags=["知识库列表"]
 # app.add_route(list_docs, "/api/orag/select/document", methods=['POST'])  # tags=["文件列表"]
 app.add_route(get_user_id_by_name, "/api/orag/select/user_id", methods=['POST'])  # tags=["获取用户ID"]
+app.add_route(check_file_list, "/api/orag/select/files", methods=['POST'])  # tags=["检查文件列表"]
 
 # update ------------------------------------------------------------------------------------------------
 app.add_route(update_user_name, "/api/orag/update/user_name", methods=['POST'])  # tags=["更新用户名"]
