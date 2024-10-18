@@ -255,7 +255,7 @@ class MySQLClient:
         return result
 
     def check_kb_exist_by_name(self, user_id, new_kb_name):
-        query = "SELECT 1 FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s"
+        query = "SELECT 1 FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s AND deleted = 0"
         result = self.execute_query_(query, (new_kb_name, user_id), fetch=True)
         return bool(result)
 
