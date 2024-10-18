@@ -1,42 +1,33 @@
-from SystemCode.connector.database.milvus_client import MilvusClient
-from SystemCode.server.model_manager import ModelManager
-from pymilvus import Collection, utility
-import pymilvus
+from pymilvus import Collection
+from pymilvus import connections
 
-pymilvus.connections.connect(
-    host='47.108.135.173',
-    port='19530'
-)
+# 连接到 Milvus 数据库
+connections.connect("default", host='47.108.135.173', port='19530')
 
-print(utility.list_collections())
-collection = Collection(name='c89149173e4b435cbf0f5be4302086c4')
-print(collection.partitions)
-p = pymilvus.Partition(collection, 'KB2c83eb356644492cbadd36a176e8b7f3')
-print(p.num_entities)
+# 替换为你的集合名
+collection_name = 'U3e6e0a3b608648e39cf8f9c37ec57c8f'
+collection = Collection(collection_name)
+res = collection.query(expr="file_id != ''")
+print(res)
 
+file_id = ['F5371478ee02e463fad7b2d355aca7612']
 
-class Doc:
-    def __init__(self, page_content):
-        self.page_content = page_content
+results = collection.query(expr=f"file_id in {file_id}")
 
-
-model_manager = ModelManager()
-query = ''
-emb = model_manager.get_embedding([Doc(query)])
+if results:
+    for result in results:
+        print(result)
+else:
+    print("No result found!")
 
 
-client = MilvusClient(mode='remote', user_id='c89149173e4b435cbf0f5be4302086c4',
-                      kb_ids='KB2c83eb356644492cbadd36a176e8b7f3')
+# collection.delete(expr=f"file_id in {file_id}")
 
-for p in client.partitions:
-    print(p.num_entities)
+results = collection.query(expr=f"file_id in {file_id}")
 
-
-result = client.search_emb_async(
-    embs=emb,
-    model_manager=model_manager,
-    top_k=500,
-    queries=query
-)
-
-1
+# 打印结果
+if results:
+    for result in results:
+        print(result)
+else:
+    print("No result found!")
