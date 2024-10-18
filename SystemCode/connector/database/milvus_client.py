@@ -120,6 +120,10 @@ class MilvusClient:
         milvus_records = self.sess.search(data=embs, partition_names=self.kb_ids, anns_field="embedding",
                                           param=self.search_params, limit=top_k,
                                           output_fields=self.output_fields, expr=expr, timeout=client_timeout)
+
+        # 2nd resort
+
+
         milvus_records_proc = self.parse_batch_result(milvus_records)
         # debug_logger.info(milvus_records)
 

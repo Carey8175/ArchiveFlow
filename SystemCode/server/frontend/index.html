@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="baseManage.css"> <!-- Link to your CSS file -->
+    <title>Knowledgebase Page</title>
+</head>
+<body>
+    <header class="header">
+    <div class="username-container">
+        <div id="rename-container">
+            <input type="text" id="new_username" placeholder="Enter new username" />
+            <button id="confirm-rename-button">Confirm</button>
+            <button id="cancel-rename-button">Cancel</button>
+        </div>
+        <span id="user_name"></span> <!-- Display current username -->
+        <button id="rename-button">Rename</button>
+    </div>
+</header>
+    <main>
+        <aside>
+            <h2>Knowledgebase List</h2>
+            <input type="text" id="new-knowledgebase" placeholder="New Knowledgebase Name">
+            <button id="add-knowledgebase">Add Knowledgebase</button>
+            <ul id="knowledgebase-list"></ul>
+        </aside>
+
+        <section id="chat-interface" style="display: none;">
+            <h2>Chat Interface</h2>
+        </section>
+        <section id="database-management" style="display: none;">
+            <h2>Database Management</h2>
+            <div id="knowledgebase-actions" style="display: none;">
+                <input type="text" id="edit-knowledgebase-name" placeholder="Edit Knowledgebase Name">
+                <button id="edit-knowledgebase">Edit</button>
+                <button id="delete-knowledgebase">Delete</button>
+            </div>
+            <h4 style="display: none;">Upload Document</h4>
+            <div class="file-upload-container" style="display: none;">
+                <input type="file" id="file" accept=".txt, .pdf, .docx, .md, .jpg, .jpeg, .png" />
+                <button id="upload-button">Upload</button>
+                <input type="text" id="url-input" placeholder="Enter URL" />
+                <button id="add-url-button">Add URL</button>
+                <progress id="upload-progress" value="0" max="100" style="width: 100%; display: none;"></progress>
+            </div>
+            <h2 style="display: none; font-size: 18px; margin-bottom: 10px;">File Management</h2>
+            <div id="file-list" style="display: none;"></div>
+            <div id="context-menu" style="display: none; position: absolute; background-color: white; border: 1px solid #ccc; padding: 10px;">
+                <li id="delete-file" style="display:none;">Delete</li>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="header.js"></script>
+    <script type="module" src="sidebar.js"></script>
+    <script type="module" src="baseManage.js"></script>
+
+</body>
+</html>
