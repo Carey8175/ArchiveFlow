@@ -1,12 +1,15 @@
+from SystemCode.connector.database.mysql_client import MySQLClient
 from SystemCode.connector.database.milvus_client import MilvusClient
 from SystemCode.server.model_manager import ModelManager
 from pymilvus import Collection, utility
 import pymilvus
 
+
 pymilvus.connections.connect(
     host='47.108.135.173',
     port='19530'
 )
+
 
 print(utility.list_collections())
 collection = Collection(name='c89149173e4b435cbf0f5be4302086c4')

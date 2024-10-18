@@ -27,7 +27,8 @@ class MilvusFailed(Exception):
 class MilvusClient:
     def __init__(self, mode, user_id, kb_ids, *, threshold=0.475, client_timeout=3, gpu_enable=False):
         self.user_id = user_id
-        self.kb_ids = kb_ids if type(kb_ids) is list else [kb_ids]
+        self.kb_ids = kb_ids if isinstance(kb_ids, list) else [kb_ids]
+
         if mode == 'local':
             self.host = MYSQL_LOCAL_HOST
         else:
@@ -118,6 +119,7 @@ class MilvusClient:
             logging.error(e)
 
     def __search_emb_sync(self, embs, expr='', model_manager: ModelManager = None, top_k=None, client_timeout=None, queries=None):
+
         if not top_k:
             top_k = self.top_k
         milvus_records = self.sess.search(data=embs, partition_names=self.kb_ids, anns_field="embedding",
@@ -342,10 +344,6 @@ class MilvusClient:
             return new_cands
 
 
-async def insert(db, docs, embeddings):
-    result = await db.insert_files('test', '天降神婿.txt', '../../core/天降神婿.txt', docs, embeddings)
-
-
 if __name__ == '__main__':
     test = MilvusClient(
         mode='remote',
@@ -379,8 +377,6 @@ if __name__ == '__main__':
 
     # np.save('embeddings.npy', embeddings)
     # embeddings = np.load('embeddings.npy')
-
-    asyncio.run(insert(test, docs, embeddings))
 
     while True:
         time.sleep(1)

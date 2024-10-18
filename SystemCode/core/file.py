@@ -88,8 +88,10 @@ if __name__ == '__main__':
     from paddleocr import PaddleOCR
 
     ocr_engine = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=False, show_log=True)
+
     # file = File(uuid.uuid4().hex, uuid.uuid4().hex, "S-PSUPR Day1b.pdf", "S-PSUPR Day1b.pdf")
     # docs = file.split_file(ocr_engine)
 
     url_file = File(uuid.uuid4().hex, uuid.uuid4().hex, "wikipedia", None, url="https://zh.wikipedia.org")
     url_docs = url_file.split_file(ocr_engine)
+
