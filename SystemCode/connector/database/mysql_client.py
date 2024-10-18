@@ -278,7 +278,7 @@ class MySQLClient:
     #     return bool(result)
 
     def check_url_exist(self, kb_id, url):
-        query = "SELECT 1 FROM File WHERE kb_id = %s AND file_path = %s"
+        query = "SELECT 1 FROM File WHERE kb_id = %s AND file_path = %s AND deleted = 0"
         result = self.execute_query_(query, (kb_id, url), fetch=True)
         return bool(result)
 

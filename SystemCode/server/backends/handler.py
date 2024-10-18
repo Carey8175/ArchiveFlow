@@ -269,7 +269,7 @@ async def upload_files(req: sanic_request):
         file_id, msg = mysql_client.add_file(user_id, kb_id, file_name, timestamp, file_size, file_path)
         logging.info(f"{file_name}, {file_id}, {msg}")
         data.append(
-            {"file_id": file_id, "file_name": file_name, "status": "waiting", "bytes(KB)": file_size // (8 * 1024),
+            {"file_id": file_id, "file_name": file_name, "status": "waiting", "bytes(KB)": file_size // 1024,
              "timestamp": timestamp})
 
     if exist_file_names:
