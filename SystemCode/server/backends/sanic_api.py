@@ -74,6 +74,10 @@ app.add_route(update_knowledge_base_name, "/api/orag/update/kb_name", methods=['
 # search ------------------------------------------------------------------------------------------------
 app.add_route(login, "/api/orag/search/login", methods=['POST'])  # tags=["登录"]
 
+# chat---------------------------------------------------------------------------------------------------
+app.add_route(chat, "/api/orag/chat", methods=['POST'])  # tags=["问答接口"]
+
+
 
 #app.add_route(document, "/api/docs", methods=['GET'])
 

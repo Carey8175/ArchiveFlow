@@ -4,6 +4,7 @@ import uuid
 import urllib
 import asyncio
 import logging
+from openai import OpenAI
 from datetime import datetime
 
 from sanic.response import ResponseStream
@@ -446,3 +447,41 @@ async def login(req: sanic_request):
 
     logging.info("[API]-[login] user_id: %s", user_id)
     return sanic_json({"code": 200, "msg": "success log in", "status": True, "user_id": user_id})
+
+
+# --------chatbot--------
+async def chat(req: sanic_request):
+    """
+    uer_id, messages, model
+    :param req:
+    :return:
+    """
+    user_id = safe_get(req, 'user_id')
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+    logging.info("[API]-[chat] user_id: %s", user_id)
+
+    model = safe_get(req, 'model')
+    if not model:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    messages = safe_get(req, 'messages')
+    if not messages:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    api_key, base_url = mysql_client.get_chat_information(user_id)[0]
+
+    chat_client = OpenAI(
+        api_key=api_key,
+        base_url=base_url
+    )
+
+    chat_response = chat_client.chat.completions.create(
+        model=model,
+        messages=messages
+    )
+
+    return sanic_json({"code": 200, "msg": "success", "data": chat_response.choices[0].message.content})

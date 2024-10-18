@@ -324,6 +324,16 @@ class MySQLClient:
         return True
 
 
+    def get_chat_information(self, user_id):
+        query = """
+            SELECT api_key, base_url
+            FROM User
+            WHERE user_id = %s;
+        """
+        results = self.execute_query_(query, (user_id,), fetch=True)
+
+        return results
+
 if __name__ == '__main__':
     client = MySQLClient('remote')
     client.check_kb_exist('1', ['1'])
