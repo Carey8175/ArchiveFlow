@@ -535,22 +535,26 @@ async def chat_stream(req: sanic_request):
     except IndexError:
         return sanic_json({"code": 2002, "msg": f'用户{user_id}未绑定API_KEY，请绑定API信息！'}, status=400)
 
+    async def chat_response_stream(chat_client, model, messages):
+        chat_response = chat_client.chat.completions.create(
+            model=model,
+            messages=messages,
+            stream=True
+        )
+
+        for chunk in chat_response:
+            content = chunk.choices[0].delta.content
+            if content:
+                await asyncio.sleep(0.01)
+                yield content
+
     chat_client = OpenAI(api_key=api_key, base_url=base_url)
+    chat_generator = chat_response_stream(chat_client, model, messages)
+    response = await req.respond()
 
-    async def generate_response(response):
-        try:
-            for chunk in chat_client.chat.completions.create(
-                    model=model,
-                    messages=messages,
-                    stream=True
-            ):
-                content = chunk.choices[0].delta.content
-                # 每次发送 JSON 响应
-                await response.write(content)
+    async for content in chat_generator:
+        await response.send(content)
 
-        except Exception as e:
-            # 处理错误并返回错误响应
-            await response.write(f"Error: {str(e)}")
+    await response.eof()
 
-    # 返回流式响应
-    return ResponseStream(generate_response)
+

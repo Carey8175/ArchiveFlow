@@ -78,7 +78,6 @@ app.add_route(login, "/api/orag/search/login", methods=['POST'])  # tags=["登�
 app.add_route(chat, "/api/orag/chat", methods=['POST'])  # tags=["问答接口"]
 app.add_route(chat_stream, "/api/orag/chat_stream", methods=['POST'])  # tags=["问答接口"]
 
-
 #app.add_route(document, "/api/docs", methods=['GET'])
 
 #app.add_route(upload_weblink, "/api/local_doc_qa/upload_weblink", methods=['POST'])  # tags=["上传网页链接"]

@@ -1,45 +1,18 @@
-from SystemCode.connector.database.mysql_client import MySQLClient
-from SystemCode.connector.database.milvus_client import MilvusClient
-from SystemCode.server.model_manager import ModelManager
-from pymilvus import Collection, utility
-import pymilvus
+import requests
 
+url = "http://127.0.0.1:8777/api/orag/chat_stream"
+data = {
+    "user_id": "U3e6e0a3b608648e39cf8f9c37ec57c8f",
+    "model": "gpt-3.5-turbo",
+    "messages": [
+        {"role": "user", "content": "解释一下cnn 800字以上"}
+    ]
+}
 
-pymilvus.connections.connect(
-    host='47.108.135.173',
-    port='19530'
-)
+response = requests.post(url, json=data, stream=True)
 
-
-print(utility.list_collections())
-collection = Collection(name='c89149173e4b435cbf0f5be4302086c4')
-print(collection.partitions)
-p = pymilvus.Partition(collection, 'KB2c83eb356644492cbadd36a176e8b7f3')
-print(p.num_entities)
-
-
-class Doc:
-    def __init__(self, page_content):
-        self.page_content = page_content
-
-
-model_manager = ModelManager()
-query = ''
-emb = model_manager.get_embedding([Doc(query)])
-
-
-client = MilvusClient(mode='remote', user_id='c89149173e4b435cbf0f5be4302086c4',
-                      kb_ids='KB2c83eb356644492cbadd36a176e8b7f3')
-
-for p in client.partitions:
-    print(p.num_entities)
-
-
-result = client.search_emb_async(
-    embs=emb,
-    model_manager=model_manager,
-    top_k=500,
-    queries=query
-)
-
-1
+# 实时打印响应内容
+for line in response.iter_lines():
+    if line:
+        print(line.decode('utf-8'))
+        print()
