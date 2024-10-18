@@ -21,7 +21,7 @@ class Doc:
 
 
 model_manager = ModelManager()
-query = 'Insert'
+query = ''
 emb = model_manager.get_embedding([Doc(query)])
 
 
@@ -35,7 +35,7 @@ for p in client.partitions:
 result = client.search_emb_async(
     embs=emb,
     model_manager=model_manager,
-    top_k=70,
+    top_k=500,
     queries=query
 )
 
