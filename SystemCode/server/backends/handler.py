@@ -285,6 +285,9 @@ async def upload_files(req: sanic_request):
     if exist_file_names:
         msg = f'warning，当前的mode是soft，无法上传同名文件{exist_file_names}，如果想强制上传同名文件，请设置mode：strong'
         return sanic_json({"code": 2001, "msg": msg, "data": data, "files_wrong_end": files_wrong_end})
+    elif files_wrong_end:
+        msg = f'warning，存在文件格式不支持{files_wrong_end}，请检查文件格式'
+        return sanic_json({"code": 2006, "msg": msg, "data": data, "files_wrong_end": files_wrong_end})
     else:
         msg = "success，后台正在飞速上传文件，请耐心等待"
         return sanic_json({"code": 200, "msg": msg, "data": data, "files_wrong_end": files_wrong_end})
