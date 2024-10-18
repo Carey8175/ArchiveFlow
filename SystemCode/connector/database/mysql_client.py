@@ -311,7 +311,7 @@ class MySQLClient:
         return True
 
 
-    def update_status(self, file_id, chunk_size, status):
+    def update_status(self, file_id, status):
         query = """
             UPDATE File
             SET status = %s, chunk_size = %s

@@ -229,6 +229,16 @@ async def upload_files(req: sanic_request):
     else:
         files = req.files.getlist('files')
 
+    # check file endswith txt pdf docx md jpg jpeg png
+    # delete file from files if not endswith
+    files_wrong_end = []
+    for file in files:
+        if not file.name.endswith(('.txt', '.pdf', '.docx', '.md', '.jpg', '.jpeg', '.png', '.url')):
+            file_name_no_ext = file.name
+            logging.info('此文件的格式不被支持: %s', file_name_no_ext)
+            files.remove(file)
+            files_wrong_end.append(file_name_no_ext)
+
     data = []
     local_files = []
     file_names = []
@@ -274,10 +284,10 @@ async def upload_files(req: sanic_request):
 
     if exist_file_names:
         msg = f'warning，当前的mode是soft，无法上传同名文件{exist_file_names}，如果想强制上传同名文件，请设置mode：strong'
-        return sanic_json({"code": 2001, "msg": msg, "data": data})
+        return sanic_json({"code": 2001, "msg": msg, "data": data, "files_wrong_end": files_wrong_end})
     else:
         msg = "success，后台正在飞速上传文件，请耐心等待"
-        return sanic_json({"code": 200, "msg": msg, "data": data})
+        return sanic_json({"code": 200, "msg": msg, "data": data, "files_wrong_end": files_wrong_end})
 
 
 async def upload_url(req: sanic_request):
