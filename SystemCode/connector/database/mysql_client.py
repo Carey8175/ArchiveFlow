@@ -311,6 +311,19 @@ class MySQLClient:
         return True
 
 
+    def update_status(self, file_id, chunk_size, status):
+        query = """
+            UPDATE File
+            SET status = %s, chunk_size = %s
+            WHERE file_id = %s;
+        """
+        self.execute_query_(query, (status, chunk_size, file_id), commit=True)
+
+        logging.info("[SUCCESS] File status updated")
+
+        return True
+
+
 if __name__ == '__main__':
     client = MySQLClient('remote')
     client.check_kb_exist('1', ['1'])
