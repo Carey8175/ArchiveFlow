@@ -93,4 +93,4 @@ app.add_route(chat, "/api/orag/chat", methods=['POST'])  # tags=["问答接口"]
 #app.add_route(rename_knowledge_base, "/api/local_doc_qa/rename_knowledge_base", methods=['POST'])  # tags=["重命名知识库"]
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8777, workers=3, access_log=False)
+    app.run(host='0.0.0.0', port=8777, workers=1, access_log=False)

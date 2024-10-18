@@ -1,6 +1,7 @@
 import os
 import re
 import uuid
+import json
 import urllib
 import asyncio
 import logging
@@ -470,9 +471,17 @@ async def chat(req: sanic_request):
 
     messages = safe_get(req, 'messages')
     if not messages:
-        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+        return sanic_json({"code": 2002, "msg": f'Messages未传入！request.json：{req.json}，请检查！'})
+    if not isinstance(messages, list):
+        try:
+            messages = json.loads(messages)
+        except Exception as e:
+            return sanic_json({"code": 2002, "msg": f'Messages 格式错误！request.json：{req.json}，Error:{e}请检查！'})
 
-    api_key, base_url = mysql_client.get_chat_information(user_id)[0]
+    try:
+        api_key, base_url = mysql_client.get_chat_information(user_id)[0]
+    except:
+        return sanic_json({"code": 2002, "msg": f'用户{user_id}未绑定API_KEY，请绑定API信息！'})
 
     chat_client = OpenAI(
         api_key=api_key,
@@ -484,4 +493,8 @@ async def chat(req: sanic_request):
         messages=messages
     )
 
-    return sanic_json({"code": 200, "msg": "success", "data": chat_response.choices[0].message.content})
+    content = chat_response.choices[0].message.content
+
+    messages.append({"role": "assistant", "content": content})
+
+    return sanic_json({"code": 200, "msg": "success", "data": content, "messages": messages})
