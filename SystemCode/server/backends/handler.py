@@ -544,7 +544,7 @@ async def chat_stream(req: sanic_request):
                     messages=messages,
                     stream=True
             ):
-                content = chunk.choices[0].message.content
+                content = chunk.choices[0].delta.content
                 # 每次发送 JSON 响应
                 await response.write(content)
 
