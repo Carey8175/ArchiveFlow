@@ -18,6 +18,7 @@ from SystemCode.configs.basic import *
 # from SystemCode.core.file import File
 from SystemCode.utils.general_utils import *
 from SystemCode.connector.database.mysql_client import MySQLClient
+from SystemCode.connector.database.milvus_client import MilvusClient
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -393,6 +394,10 @@ async def delete_file(req: sanic_request):
         return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
 
     mysql_client.delete_file(user_id, kb_id, file_id)
+
+    milvus_client = MilvusClient(CONNECT_MODE, user_id, kb_id)
+    milvus_client.delete_files([file_id])
+
     return sanic_json({"code": 200, "msg": "success delete file"})
 
 

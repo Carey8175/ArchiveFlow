@@ -238,9 +238,9 @@ class MilvusClient:
         part.release()
         self.sess.drop_partition(partition_name)
 
-    def delete_files(self, files_id):
-        self.sess.delete(expr=f"file_id in {files_id}")
-        logging.info('milvus delete files_id: %s', files_id)
+    def delete_files(self, file_id):
+        self.sess.delete(expr=f"file_id in {file_id}")
+        logging.info('milvus delete files_id: %s', file_id)
 
     def get_files(self, files_id):
         res = self.query_expr_async(expr=f"file_id in {files_id}", output_fields=["file_id"])
