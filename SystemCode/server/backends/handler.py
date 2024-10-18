@@ -498,3 +498,59 @@ async def chat(req: sanic_request):
     messages.append({"role": "assistant", "content": content})
 
     return sanic_json({"code": 200, "msg": "success", "data": content, "messages": messages})
+
+
+async def chat_stream(req: sanic_request):
+    """
+    Handles chat requests with streaming response.
+    :param req: Sanic request object.
+    :return: Streaming response with chat content.
+    """
+    user_id = safe_get(req, 'user_id')
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'}, status=400)
+
+    if not validate_user_id(user_id):
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)}, status=400)
+
+    logging.info("[API]-[chat] user_id: %s", user_id)
+
+    model = safe_get(req, 'model')
+    if not model:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'}, status=400)
+
+    messages = safe_get(req, 'messages')
+    if not messages:
+        return sanic_json({"code": 2002, "msg": f'Messages未传入！request.json：{req.json}，请检查！'}, status=400)
+
+    if not isinstance(messages, list):
+        try:
+            messages = json.loads(messages)
+        except json.JSONDecodeError as e:
+            return sanic_json({"code": 2002, "msg": f'Messages 格式错误！request.json：{req.json}，Error:{str(e)}请检查！'},
+                              status=400)
+
+    try:
+        api_key, base_url = mysql_client.get_chat_information(user_id)[0]
+    except IndexError:
+        return sanic_json({"code": 2002, "msg": f'用户{user_id}未绑定API_KEY，请绑定API信息！'}, status=400)
+
+    chat_client = OpenAI(api_key=api_key, base_url=base_url)
+
+    async def generate_response(response):
+        try:
+            for chunk in chat_client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    stream=True
+            ):
+                content = chunk.choices[0].message.content
+                # 每次发送 JSON 响应
+                await response.write(content)
+
+        except Exception as e:
+            # 处理错误并返回错误响应
+            await response.write(f"Error: {str(e)}")
+
+    # 返回流式响应
+    return ResponseStream(generate_response)
