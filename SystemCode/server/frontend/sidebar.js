@@ -1,13 +1,16 @@
-import { selectedKnowledgebase } from './baseManage.js';
+import {deleteKnowledgebase, manageKnowledgebase} from './baseManage.js';
 
 const backendHost = "http://47.108.135.173";
 const backendPort = "8777";
 const knowledgebaseUrl = `${backendHost}:${backendPort}/api/orag/select/knowledge_base`; // Knowledgebase API base URL
 const addKnowledgebaseUrl = `${backendHost}:${backendPort}/api/orag/add/knowledge_base`; // Knowledgebase API base URL
-
 const knowledgebaseList = document.getElementById("knowledgebase-list");
 const addKnowledgebaseButton = document.getElementById("add-knowledgebase");
 const newKnowledgebaseInput = document.getElementById("new-knowledgebase");
+const sidebarMenu = document.getElementById("sidebar-context-menu");
+const chatInterface = document.getElementById("chat-interface");
+
+export let selectedKnowledgebase = null;
 
 // Fetch knowledgebase list and display it
 export function loadKnowledgebases() {
@@ -28,28 +31,16 @@ export function loadKnowledgebases() {
     .then(data => {
         knowledgebaseList.innerHTML = ""; // Clear current list
         data.data.forEach(kb => {
-            const [kb_id, kb_name] = kb;
-            const listItem = document.createElement("li");
-            listItem.textContent = kb_name || "Unnamed Knowledgebase";
-
-            // Add event listener for when a knowledgebase is clicked
-            listItem.addEventListener("click", () => {
-                selectKnowledgebase(kb_id, kb_name);
-            });
-
-            knowledgebaseList.appendChild(listItem);
+            const li = document.createElement('li');
+            li.setAttribute('kb_id', kb[0]);
+            li.setAttribute('kb_name', kb[1]);
+            li.textContent = kb[1];
+            knowledgebaseList.appendChild(li);
         });
     })
     .catch(error => {
-        console.error("Error fetching knowledgebases:", error);
+        console.error("Error loading knowledge bases:", error);
     });
-}
-
-// Select a knowledgebase and show its files
-function selectKnowledgebase(kb_id, kb_name) {
-    const knowledgebase = { kb_id, kb_name };
-    const event = new CustomEvent('knowledgebaseSelected', { detail: knowledgebase });
-    document.dispatchEvent(event);
 }
 
 // Add new knowledgebase
@@ -81,32 +72,45 @@ addKnowledgebaseButton.addEventListener("click", function () {
     }
 });
 
-document.addEventListener('contextmenu', function (e) {
-    e.preventDefault();
+// Listen for right-click event on the knowledgebase list
+knowledgebaseList.addEventListener("contextmenu", function (event) {
+    event.preventDefault(); // Prevent default context menu
 
-    // Show the context menu for managing the knowledgebase
-    const contextMenu = document.getElementById("context-menu");
-    contextMenu.style.display = "block";
-    contextMenu.style.left = `${e.pageX}px`;
-    contextMenu.style.top = `${e.pageY}px`;
+    const selectedItem = event.target.closest('li');
+    if (!selectedItem) return;
 
-    // Create a "Manage Knowledgebase" option in the context menu
-    const manageKnowledgebaseOption = document.createElement("li");
-    manageKnowledgebaseOption.textContent = "Manage Knowledgebase";
-    contextMenu.appendChild(manageKnowledgebaseOption);
+    const kb_id = selectedItem.getAttribute('kb_id');
+    const kb_name = selectedItem.getAttribute('kb_name');
 
-    // Handle click on the "Manage Knowledgebase" option
-    manageKnowledgebaseOption.addEventListener('click', function () {
-        document.getElementById('database-management').style.display = 'block';
-        // Trigger the load of knowledgebase details
-        const editKnowledgebaseInput = document.getElementById("edit-knowledgebase-name");
-        editKnowledgebaseInput.value = selectedKnowledgebase.kb_name; // Set current knowledgebase name in input
-        contextMenu.style.display = 'none'; // Hide the context menu
-    });
+    if (!kb_id || !kb_name) return;
 
-    // Hide the context menu when clicking elsewhere
-    document.addEventListener('click', () => {
-        contextMenu.style.display = 'none';
+    selectedKnowledgebase = { kb_id, kb_name };
+
+    // Show the custom context menu
+    sidebarMenu.style.display = "block";
+    sidebarMenu.style.left = `${event.pageX}px`;
+    sidebarMenu.style.top = `${event.pageY}px`;
+
+    // Handle context menu item clicks
+    document.getElementById("manage-knowledgebase").onclick = function() {
+        chatInterface.style.display = "none";
+        manageKnowledgebase()
+        sidebarMenu.style.display = "none"; // Hide the menu
+    };
+
+    document.getElementById("delete-knowledgebase").onclick = function() {
+        const confirmDelete = confirm(`Are you sure you want to delete the knowledge base "${selectedKnowledgebase.kb_name}"?`);
+        if (confirmDelete) {
+            deleteKnowledgebase();
+        }
+        sidebarMenu.style.display = "none"; // Hide the menu
+    };
+
+    // Hide menu when clicking outside
+    document.addEventListener("click", function () {
+        if (sidebarMenu&& !sidebarMenu.contains(event.target)) {
+            sidebarMenu.style.display = "none";
+        }
     });
 });
 

@@ -1,0 +1,68 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0; /* Background color retained */
+    margin: 0;
+    padding: 20px;
+}
+
+#chat-interface {
+    background-color: transparent; /* Make chat interface background transparent */
+    border-radius: 0; /* Remove border radius */
+    box-shadow: none; /* Remove shadow */
+    padding: 0; /* Remove padding */
+    max-width: 500px; /* Set max width if necessary */
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    height: 500px; /* Set fixed height for chat interface */
+}
+
+h2 {
+    text-align: left; /* Align title to the left */
+    margin-bottom: 20px;
+    padding-left: 10px; /* Add some left padding */
+}
+
+#message-list {
+    list-style-type: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: none; /* Remove border */
+}
+
+#message-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd; /* Retain bottom border for message items */
+}
+
+#message-list li:last-child {
+    border-bottom: none; /* Remove bottom border for last message */
+}
+
+.input-container {
+    display: flex;
+    margin-top: auto; /* Push input container to the bottom */
+}
+
+#message-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd; /* Input field border */
+    border-radius: 4px; /* Input field rounded corners */
+}
+
+#send-button {
+    padding: 10px 15px;
+    margin-left: 10px;
+    background-color: #357ab8; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* Remove button border */
+    border-radius: 4px; /* Button rounded corners */
+    cursor: pointer;
+}
+
+#send-button:hover {
+    background-color: #357ab8; /* Button hover background color */
+}

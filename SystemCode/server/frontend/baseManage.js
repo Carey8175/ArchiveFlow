@@ -1,5 +1,4 @@
-import {loadKnowledgebases} from "./sidebar.js";
-import {setupHeader} from "./header.js";
+import {selectedKnowledgebase, loadKnowledgebases} from "./sidebar.js";
 
 const backendHost = "http://47.108.135.173";
 const backendPort = "8777";
@@ -10,25 +9,40 @@ const addUrlUrl = `${backendHost}:${backendPort}/api/orag/add/url`; // Knowledge
 const editKnowledgebaseUrl = `${backendHost}:${backendPort}/api/orag/update/kb_name`; // Knowledgebase API base URL
 const deleteKnowledgebaseUrl = `${backendHost}:${backendPort}/api/orag/delete/knowledge_base`; // Knowledgebase API base URL
 
-const knowledgebaseActions = document.getElementById("knowledgebase-actions");
-const editKnowledgebaseInput = document.getElementById("edit-knowledgebase-name");
-const editKnowledgebaseButton = document.getElementById("edit-knowledgebase");
-const deleteKnowledgebaseButton = document.getElementById("delete-knowledgebase");
+const databaseManagement = document.getElementById("database-management")
+const knowledgebaseActions = document.getElementById("delete-knowledgebase");
+const sidebarMenu = document.getElementById("sidebar-context-menu");
 
-const fileUploadContainer = document.querySelector(".file-upload-container");
 const fileList = document.getElementById("file-list");
-const uploadButton = document.getElementById("upload-button");
 const fileInput = document.getElementById("file");
 const allowedExtensions = ['.txt', '.pdf', '.docx', '.md', '.jpg', '.jpeg', '.png'];
 const urlInput = document.getElementById('url-input');
-const addUrlButton = document.getElementById('add-url-button');
 const uploadProgress = document.getElementById('upload-progress');
+const contextMenu = document.getElementById("context-menu");
 
-let selectedKnowledgebase = null;
+export function manageKnowledgebase(selectedKnowledgebase) {
+    databaseManagement.style.display = "block";
+
+    document.getElementById("confirm-edit").onclick = function() {
+        editKnowledgebase(selectedKnowledgebase);
+    };
+
+    document.getElementById("upload-button").onclick = function() {
+        uploadFile(selectedKnowledgebase);
+    };
+
+    document.getElementById("add-url-button").onclick = function() {
+        addUrl(selectedKnowledgebase);
+    };
+
+    loadFileList();
+}
+
+
 
 // Edit selected knowledgebase
-editKnowledgebaseButton.addEventListener("click", function () {
-    const newKbName = editKnowledgebaseInput.value;
+function editKnowledgebase() {
+    const newKbName = prompt("Enter new knowledgebase name:");
 
     if (selectedKnowledgebase && newKbName) {
         fetch(editKnowledgebaseUrl, {
@@ -43,6 +57,7 @@ editKnowledgebaseButton.addEventListener("click", function () {
                 if (data.code===200) {
                     loadKnowledgebases(); // Reload list
                     knowledgebaseActions.style.display = "none"; // Hide actions
+                    alert(data.message || "Rename Success.");
                 } else {
                     alert(data.message || "Failed to edit knowledgebase.");
                 }
@@ -50,13 +65,13 @@ editKnowledgebaseButton.addEventListener("click", function () {
             .catch(error => {
                 console.error("Error editing knowledgebase:", error);
             });
-        } else {
-            alert("Please select a knowledgebase and enter a valid name.");
-        }
-});
+    } else {
+        alert("Rename Canceled");
+    }
+}
 
 // Delete selected knowledgebase
-deleteKnowledgebaseButton.addEventListener("click", function () {
+function deleteKnowledgebase() {
     if (selectedKnowledgebase) {
         fetch(deleteKnowledgebaseUrl, {
             method: "POST",
@@ -69,7 +84,7 @@ deleteKnowledgebaseButton.addEventListener("click", function () {
             .then(data => {
                 if (data.code===200) {
                     loadKnowledgebases(); // Reload list
-                    knowledgebaseActions.style.display = "none"; // Hide actions
+                    sidebarMenu.style.display = "none"; // Hide actions
                 } else {
                     alert(data.message || "Failed to delete knowledgebase.");
                 }
@@ -80,22 +95,10 @@ deleteKnowledgebaseButton.addEventListener("click", function () {
         } else {
             alert("Please select a knowledgebase to delete.");
         }
-});
-
-
-// Listen for knowledgebase selection event
-document.addEventListener("knowledgebaseSelected", function (event) {
-    selectedKnowledgebase = event.detail;
-    const knowledgebaseActions = document.getElementById("knowledgebase-actions");
-    knowledgebaseActions.style.display = "block";
-
-    // Hide file upload and file list sections
-    fileUploadContainer.style.display = "none";
-    fileList.style.display = "none";
-});
+}
 
 // Fetch file list based on selected knowledgebase
-function loadFileList() {
+function loadFileList(e) {
     if (!selectedKnowledgebase || !selectedKnowledgebase.kb_id) {
         console.error("Knowledgebase ID not found.");
         return;
@@ -196,94 +199,95 @@ function deleteFile(file_id) {
 
 
 
-    uploadButton.addEventListener("click", () => {
-        const file = fileInput.files[0];
-        if (!file) {
-            alert("Please select a file to upload.");
-            return;
+function uploadFile() {
+    const file = fileInput.files[0];
+    if (!file) {
+        alert("Please select a file to upload.");
+        return;
+    }
+
+    const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+    if (!allowedExtensions.includes(fileExtension)) {
+        alert(`Invalid file type. Allowed types: ${allowedExtensions.join(', ')}`);
+        return;
+    }
+
+    const reader = new FileReader();
+    const formData = new FormData();
+    formData.append('kb_id', selectedKnowledgebase.kb_id);
+    formData.append('user_id', getCookie('user_id'));
+    formData.append('files', file);
+    formData.append('mode', 'soft');
+
+    uploadProgress.style.display = 'block';
+    uploadProgress.value = 0;
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+            uploadProgress.value = (event.loaded / event.total) * 100;
         }
-
-        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-        if (!allowedExtensions.includes(fileExtension)) {
-            alert(`Invalid file type. Allowed types: ${allowedExtensions.join(', ')}`);
-            return;
-        }
-
-        const reader = new FileReader();
-        const formData = new FormData();
-        formData.append('kb_id', selectedKnowledgebase.kb_id);
-        formData.append('user_id', getCookie('user_id'));
-        formData.append('files', file);
-        formData.append('mode', 'soft');
-
-        uploadProgress.style.display = 'block';
-        uploadProgress.value = 0;
-
-        const xhr = new XMLHttpRequest();
-
-        xhr.upload.addEventListener("progress", (event) => {
-            if (event.lengthComputable) {
-                uploadProgress.value = (event.loaded / event.total) * 100;
-            }
-        });
-
-        xhr.open("POST", uploadFileUrl, true);
-
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                const data = JSON.parse(xhr.responseText);
-                if (data.code === 200) {
-                    alert("File uploaded successfully!");
-                    loadFileList();
-                } else {
-                    alert(data.msg || "Failed to upload file.");
-                }
-            } else {
-                alert("Error uploading file.");
-            }
-
-            uploadProgress.style.display = 'none';
-        };
-
-        xhr.onerror = () => {
-            alert("Error uploading file.");
-            uploadProgress.style.display = 'none';
-        };
-
-        xhr.send(formData);
     });
 
-    addUrlButton.addEventListener("click", () => {
-        const url = urlInput.value.trim();
+    xhr.open("POST", uploadFileUrl, true);
 
-        if (!url) {
-            alert("Please enter a URL.");
-            return;
+    xhr.onload = () => {
+        if (xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText);
+            if (data.code === 200) {
+                alert("File uploaded successfully!");
+                loadFileList();
+                fileInput.value = '';
+            } else {
+                alert(data.msg || "Failed to upload file.");
+            }
+        } else {
+            alert("Error uploading file.");
         }
+        uploadProgress.style.display = 'none';
+    };
 
-        const formData = new FormData();
-        formData.append('kb_id', selectedKnowledgebase.kb_id);
-        formData.append('user_id', getCookie('user_id'));
-        formData.append('url', url);
+    xhr.onerror = () => {
+        alert("Error uploading file.");
+        uploadProgress.style.display = 'none';
+    };
+    xhr.send(formData);
+}
 
-        fetch(addUrlUrl, {
-            method: "POST",
-            body: formData,
-        })
+function addUrl() {
+    console.log("added")
+    const url = urlInput.value.trim();
+
+    if (!url) {
+        alert("Please enter a URL.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('kb_id', selectedKnowledgebase.kb_id);
+    formData.append('user_id', getCookie('user_id'));
+    formData.append('url', url);
+
+    fetch(addUrlUrl, {
+        method: "POST",
+        body: formData,
+    })
         .then(response => response.json())
         .then(data => {
             if (data.code === 200) {
                 alert("uploaded successfully!");
                 loadFileList();
+                urlInput.value = '';
             } else {
-                uploadStatus.textContent = data.msg || "Failed to upload URL.";
+                alert("Error!");
             }
         })
         .catch(error => {
             console.error("Error uploading URL:", error);
             alert("Error uploading URL.");
         });
-    });
+}
 
 function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -292,6 +296,6 @@ function getCookie(name) {
     return null;
 }
 
-export { selectedKnowledgebase };
+export { deleteKnowledgebase };
 
 
