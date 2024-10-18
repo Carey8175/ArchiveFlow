@@ -15,6 +15,7 @@ p = pymilvus.Partition(collection, 'KB2c83eb356644492cbadd36a176e8b7f3')
 print(p.num_entities)
 
 
+
 class Doc:
     def __init__(self, page_content):
         self.page_content = page_content
