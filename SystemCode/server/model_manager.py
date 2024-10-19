@@ -1,6 +1,9 @@
 import logging
+import os.path
+
 import numpy as np
 from BCEmbedding import EmbeddingModel, RerankerModel
+from SystemCode.configs.basic import MODEL_PATH
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -9,10 +12,20 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 class ModelManager:
     def __init__(self):
         logging.info("[ModelManager]Loading embedding model and reranker model...")
-        self.embedding_model = EmbeddingModel(model_name_or_path="maidalun1020/bce-embedding-base_v1")
-        logging.info("[ModelManager]Embedding model loaded.")
-        self.reranker_model = RerankerModel(model_name_or_path="maidalun1020/bce-reranker-base_v1")
-        logging.info("[ModelManager]Reranker model loaded.")
+        try:
+            # load from huggingface
+            self.embedding_model = EmbeddingModel(model_name_or_path='maidalun1020/bce-embedding-base_v1')
+            logging.info("[ModelManager]Embedding model loaded.")
+            self.reranker_model = RerankerModel(model_name_or_path='maidalun1020/bce-reranker-base_v1')
+            logging.info("[ModelManager]Reranker model loaded.")
+        except Exception as e:
+            # load from huggingface mirror
+            self.embedding_model = EmbeddingModel(model_name_or_path='maidalun1020/bce-embedding-base_v1',
+                                                  mirror='https://hf-mirror.com')
+            logging.info("[ModelManager]Embedding model loaded.")
+            self.reranker_model = RerankerModel(model_name_or_path="maidalun1020/bce-reranker-base_v1",
+                                                mirror='https://hf-mirror.com')
+            logging.info("[ModelManager]Reranker model loaded.")
 
     def get_embedding(self, docs) -> np.array:
         docs_content = [doc.page_content for doc in docs]
