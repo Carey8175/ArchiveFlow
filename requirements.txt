@@ -11,7 +11,8 @@ PyMuPDF
 cryptography
 BCEmbedding
 pymilvus
-paddlepaddle
+paddle
+common
 paddleocr
 tiktoken
 requests
