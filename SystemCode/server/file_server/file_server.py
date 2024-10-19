@@ -49,8 +49,8 @@ class FileSystem:
                 else:
                     the_file = File(file_id=file[0], kb_id=file[1], file_name=file[3], file_path=file[4])
 
-                # docs = the_file.split_file(self.ocr_engine)
-                docs = []
+                docs = the_file.split_file(self.ocr_engine)
+                # docs = []
                 if not docs:
                     self.mysql_client.update_status(
                         file_id=file[0],
