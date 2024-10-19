@@ -16,7 +16,7 @@ from typing import List
 from SystemCode.server.model_manager import ModelManager
 
 # ----------------- Logger -----------------
-logging.basicConfig(level='INFO', format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level='INFO', format='%(asctime)s - %(levelname)s - %(message)s', force=True)
 
 
 class MilvusFailed(Exception):

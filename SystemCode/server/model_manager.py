@@ -3,7 +3,7 @@ import numpy as np
 from BCEmbedding import EmbeddingModel, RerankerModel
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
 
 
 class ModelManager:

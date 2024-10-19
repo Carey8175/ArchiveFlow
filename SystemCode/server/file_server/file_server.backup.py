@@ -69,7 +69,7 @@ def clean_up_tasks():
         time.sleep(60)  # 每60秒检查一次任务状态
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
 
 file_server_app = Sanic("FileServer")
 logging.info("File Server Starting")

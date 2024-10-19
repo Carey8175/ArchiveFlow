@@ -6,7 +6,7 @@ from SystemCode.configs.database import *
 from SystemCode.configs.basic import LOG_LEVEL
 
 # ----------------- Logger -----------------
-logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
 
 
 # ----------------- MySQL Client -----------------

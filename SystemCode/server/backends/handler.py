@@ -21,7 +21,7 @@ from SystemCode.connector.database.mysql_client import MySQLClient
 from SystemCode.connector.database.milvus_client import MilvusClient
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', force=True)
 # init Mysql client
 mysql_client = MySQLClient(CONNECT_MODE)
 

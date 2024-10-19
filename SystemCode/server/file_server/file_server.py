@@ -9,7 +9,9 @@ from SystemCode.connector.database import mysql_client, milvus_client
 from SystemCode.configs.database import CONNECT_MODE
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# ------------------ Logging ------------------
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
+logging.info("[File System] Start the file system.")
 # ------------------ File System ------------------
 # check the file is embedded or not every 5 seconds
 FILE_SYSTEM_SLEEP_TIME = 5
