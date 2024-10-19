@@ -44,7 +44,7 @@
 
         <section id="chat-interface">
             <h2>Chat Interface</h2>
-            <ul id="message-list"></ul>
+            <ul id="chat-box"></ul>
             <div id="message-box">
                 <input type="text" id="message-input" placeholder="Type your message...">
                 <button id="send-button">Send</button>
@@ -58,18 +58,21 @@
         </section>
         <div id="model-settings-modal" class="modal">
             <div class="modal-content">
-                <span class="close" id="close-modal">&times;</span>
+                <span class="close-button">&times;</span>
                 <h2>Model Settings</h2>
+                <label for="api_key">API Key:</label>
                 <input type="text" id="api-key" placeholder="Enter API Key">
+                <label for="base_url">Base URL:</label>
                 <input type="text" id="base-url" placeholder="Enter Base URL">
-                <button></button>
+
                 <label for="model-select">Select Model:</label>
                 <select id="model-select"></select>
                 <div class="token-limit">
                     <label for="token-limit">Response Limit (tokens):</label>
-                    <input type="range" id="token-limit" min="1" max="1000" oninput="updateTokenValue(this.value)">
-                    <span id="token-value">100</span>
+                    <input type="range" id="token-limit" min="1" max="1000" value="500">
+                    <span id="token-value">500</span>
                 </div>
+                <button id="confirm-button">Confirm</button>
             </div>
         </div>
 
@@ -98,6 +101,7 @@
     <script type="module" src="header.js"></script>
     <script type="module" src="sidebar.js"></script>
     <script type="module" src="baseManage.js"></script>
+    <script type="module" src="chatInterface.js"></script>
 
 </body>
 </html>

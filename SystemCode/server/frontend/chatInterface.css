@@ -110,6 +110,7 @@ button:hover {
     padding: 20px;
     border: 1px solid #888;
     width: 300px;
+    position: relative;
 }
 
 .close {
@@ -123,16 +124,6 @@ button:hover {
     margin-top: 10px;
 }
 
-.tooltip {
-    display: none;
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 5px;
-    border-radius: 5px;
-    z-index: 1000; /* Ensure it appears above other elements */
-}
-
 .enabled {
     background-color: #357ab8; /* Color when enabled */
     color: white; /* Text color when enabled */
@@ -141,4 +132,20 @@ button:hover {
 .disabled {
     background-color: grey; /* Color when disabled */
     color: white; /* Text color when disabled */
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
