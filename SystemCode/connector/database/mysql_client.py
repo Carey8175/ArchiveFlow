@@ -314,10 +314,10 @@ class MySQLClient:
     def update_status(self, file_id, status):
         query = """
             UPDATE File
-            SET status = %s, chunk_size = %s
+            SET status = %s
             WHERE file_id = %s;
         """
-        self.execute_query_(query, (status, chunk_size, file_id), commit=True)
+        self.execute_query_(query, (status, file_id), commit=True)
 
         logging.info("[SUCCESS] File status updated")
 

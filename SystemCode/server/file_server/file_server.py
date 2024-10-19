@@ -49,7 +49,16 @@ class FileSystem:
                 else:
                     the_file = File(file_id=file[0], kb_id=file[1], file_name=file[3], file_path=file[4])
 
-                docs = the_file.split_file(self.ocr_engine)
+                # docs = the_file.split_file(self.ocr_engine)
+                docs = []
+                if not docs:
+                    self.mysql_client.update_status(
+                        file_id=file[0],
+                        status='error'
+                    )
+                    logging.error(f'[File System] Fail to split the file: {file[3]}')
+                    continue
+
                 embed = self.model_manager.get_embedding(docs)
 
                 # save the embedding to the database
