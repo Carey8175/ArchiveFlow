@@ -1,4 +1,5 @@
 import {deleteKnowledgebase, manageKnowledgebase} from './baseManage.js';
+import {goToChatInterface} from './chatInterface.js';
 
 const backendHost = "http://47.108.135.173";
 const backendPort = "8777";
@@ -70,6 +71,24 @@ addKnowledgebaseButton.addEventListener("click", function () {
     } else {
         alert("Knowledgebase name cannot be empty.");
     }
+});
+
+// Left click event listener for entering chat interface
+knowledgebaseList.addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default click behavior
+
+    const selectedItem = event.target.closest('li');
+    if (!selectedItem) return;
+
+    const kb_id = selectedItem.getAttribute('kb_id');
+    const kb_name = selectedItem.getAttribute('kb_name');
+
+    if (!kb_id || !kb_name) return;
+
+    selectedKnowledgebase = { kb_id, kb_name };
+
+    // Enter chat interface for selected knowledgebase
+    goToChatInterface(selectedKnowledgebase);
 });
 
 // Listen for right-click event on the knowledgebase list

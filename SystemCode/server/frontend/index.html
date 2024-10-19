@@ -17,6 +17,7 @@
         </div>
         <span id="user_name"></span> <!-- Display current username -->
         <button id="rename-button">Rename</button>
+        <button id="logout-button">Log Out</button>
     </div>
 </header>
     <main>
@@ -44,15 +45,39 @@
         <section id="chat-interface">
             <h2>Chat Interface</h2>
             <ul id="message-list"></ul>
-            <div class="input-container">
+            <div id="message-box">
                 <input type="text" id="message-input" placeholder="Type your message...">
                 <button id="send-button">Send</button>
             </div>
+            <div class="button-container">
+                <button id="multi-turn-button" title="Multi-turn conversation is disabled">Multi-Turn</button>
+                <div id="tooltip" class="tooltip"></div>
+                <button id="new-chat-button">New Conversation</button>
+                <button id="model-settings-button">Model Settings</button>
+            </div>
         </section>
+        <div id="model-settings-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="close-modal">&times;</span>
+                <h2>Model Settings</h2>
+                <input type="text" id="api-key" placeholder="Enter API Key">
+                <input type="text" id="base-url" placeholder="Enter Base URL">
+                <button></button>
+                <label for="model-select">Select Model:</label>
+                <select id="model-select"></select>
+                <div class="token-limit">
+                    <label for="token-limit">Response Limit (tokens):</label>
+                    <input type="range" id="token-limit" min="1" max="1000" oninput="updateTokenValue(this.value)">
+                    <span id="token-value">100</span>
+                </div>
+            </div>
+        </div>
+
 
         <section id="database-management" style="display: none;">
             <h2>Database Management</h2>
             <div id="manage-actions">
+                <button id="go-back-button">Go back to Chat</button>
                 <button id="confirm-edit">Rename</button>
             </div>
             <h4>Upload Document</h4>

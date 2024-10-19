@@ -3,16 +3,18 @@ const backendPort = "8777";
 const renameUserUrl = `${backendHost}:${backendPort}/api/orag/update/user_name`; // Rename user API endpoint
 
 const renameButton = document.getElementById("rename-button");
+const logoutButton = document.getElementById("logout-button");
 const confirmRenameButton = document.getElementById("confirm-rename-button");
 const cancelRenameButton = document.getElementById("cancel-rename-button");
 const renameContainer = document.getElementById("rename-container");
 const userNameDisplay = document.getElementById("user_name");
 const newUserNameInput = document.getElementById("new_username");
 
+const storedUsername = null;
 
 export function setupHeader() {
     // Load stored username if exists
-    const storedUsername = localStorage.getItem("user_name");
+    let storedUsername = localStorage.getItem("user_name");
     if (storedUsername) {
         userNameDisplay.textContent = storedUsername;
     }
@@ -20,6 +22,12 @@ export function setupHeader() {
     // Show rename input
     renameButton.addEventListener("click", function () {
         renameContainer.style.display = "flex";
+    })
+
+    logoutButton.addEventListener("click", function () {
+        if (confirm("Are you sure you want to log out?")) {
+        window.location.href = "login.html";
+        }
     });
 
     // Cancel rename action
@@ -43,6 +51,7 @@ export function setupHeader() {
             .then(data => {
                 if (data.code===200) {
                     localStorage.setItem("user_name", newUsername); // Update localStorage with new username
+                    storedUsername = localStorage.getItem("user_name");
                     userNameDisplay.textContent = newUsername; // Update username display
                     renameContainer.style.display = "none";
                     alert("Username updated successfully!");

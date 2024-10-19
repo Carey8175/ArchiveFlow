@@ -38,7 +38,13 @@ export function manageKnowledgebase(selectedKnowledgebase) {
     loadFileList();
 }
 
-
+// Function to go back to the chat interface
+document.getElementById("go-back-button").addEventListener("click", function() {
+    // Hide the management interface
+    document.getElementById("database-management").style.display = "none";
+    // Show the chat interface
+    document.getElementById("chat-interface").style.display = "flex"; // Make sure it's displayed properly
+});
 
 // Edit selected knowledgebase
 function editKnowledgebase() {
@@ -256,11 +262,16 @@ function uploadFile() {
 }
 
 function addUrl() {
-    console.log("added")
     const url = urlInput.value.trim();
 
     if (!url) {
         alert("Please enter a URL.");
+        return;
+    }
+
+    const urlPattern = /^(http|https):\/\/[^\s$.?#].[^\s]*$/;
+    if (!urlPattern.test(url)) {
+        alert("Please enter a valid URL.");
         return;
     }
 
