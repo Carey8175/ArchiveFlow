@@ -115,7 +115,6 @@ function loadStoredData() {
     }
 }
 
-
 function toggleMultiTurn() {
     isMultiTurnEnabled = !isMultiTurnEnabled;
 
