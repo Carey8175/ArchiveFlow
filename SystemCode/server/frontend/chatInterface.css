@@ -5,6 +5,28 @@ body {
     padding: 20px;
 }
 
+/* Basic styles for the knowledge base list */
+#knowledgebase-list {
+    list-style-type: none; /* Remove default list style */
+    padding: 0; /* Remove padding */
+}
+
+/* Styles for knowledge base items */
+#knowledgebase-list li {
+    padding: 10px; /* Padding for list items */
+    margin: 5px 0; /* Margin for top and bottom */
+    border: 1px solid #ccc; /* Border */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s, border-color 0.3s; /* Smooth transition */
+}
+
+/* Styles when mouse hovers over items */
+#knowledgebase-list li:hover {
+    background-color: #e0f7fa; /* Change background color on hover */
+    border-color: #00796b; /* Change border color on hover */
+}
+
+
 #chat-interface {
     background-color: transparent; /* Make chat interface background transparent */
     border-radius: 0; /* Remove border radius */
@@ -148,4 +170,30 @@ button:hover {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+#multi-turn-button {
+    background-color: gray;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#multi-turn-button.active {
+    background-color: #357ab8;
+}
+
+#retrival-button {
+    background-color: gray;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#retrival-button.active {
+    background-color: #357ab8;
 }

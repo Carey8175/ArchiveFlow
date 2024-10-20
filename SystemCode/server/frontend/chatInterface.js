@@ -5,6 +5,7 @@ const backendPort = "18777";
 
 const chatStreamUrl = `${backendHost}:${backendPort}/api/orag/chat_stream`; // Knowledgebase API base URL
 const updateChatInfoUrl = `${backendHost}:${backendPort}/api/orag/update/user_chat_information`; // Knowledgebase API base URL
+const retrievalUrl = `${backendHost}:${backendPort}/api/orag/retrieval`; // Adjust this according to your API endpoint
 const chatContainer = document.getElementById('chat-box');
 const sendButton = document.getElementById('send-button');
 const modelSelect = document.getElementById('model-select');
@@ -15,6 +16,7 @@ const closeButton = document.querySelector('.close-button');
 const confirmButton = document.getElementById('confirm-button');
 const tokenLimit = document.getElementById('token-limit');
 const tokenValue = document.getElementById('token-value');
+const retrievalButton = document.getElementById('retrival-button');
 
 const modelOptions = [
     "gpt-3.5-turbo", "gpt-3.5-turbo-1106", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-16k",
@@ -24,9 +26,12 @@ const modelOptions = [
     "claude-3-5-sonnet-20240620"
 ];
 
+let docs = [];
 let chatHistory = [];
 let selectedModel = null;
 let isMultiTurnEnabled = false;
+let isRetrievalEnabled = false;
+let overallMessages = [];
 
 modelSettingsButton.addEventListener('click', () => {
     modal.style.display = 'block';
@@ -34,6 +39,11 @@ modelSettingsButton.addEventListener('click', () => {
 
 closeButton.addEventListener('click', () => {
     modal.style.display = 'none';
+});
+
+retrievalButton.addEventListener('click', () => {
+    isRetrievalEnabled = !isRetrievalEnabled; // Toggle the state
+    retrievalButton.classList.toggle('active', isRetrievalEnabled); // Update button style
 });
 
 confirmButton.addEventListener('click', () => {
@@ -117,15 +127,7 @@ function loadStoredData() {
 
 function toggleMultiTurn() {
     isMultiTurnEnabled = !isMultiTurnEnabled;
-
-    multiTurnBtn.title = isMultiTurnEnabled ? "Multi-turn conversation is enabled" : "Multi-turn conversation is disabled";
     multiTurnBtn.classList.toggle('active', isMultiTurnEnabled);
-
-    if (isMultiTurnEnabled) {
-        multiTurnBtn.style.backgroundColor = "blue";
-    } else {
-        multiTurnBtn.style.backgroundColor = "grey";
-    }
 }
 
 // Function to handle sending messages
@@ -134,6 +136,9 @@ function sendMessage() {
     const currentMessage = document.getElementById("message-input").value.trim(); // Get the message
     const selectedModel = document.getElementById("model-select").value;
 
+    if (!selectedKnowledgebase) {
+        alert("Please select a knowledgebase.");
+    }
     if (!selectedModel) {
         alert("Please select a model.");
         return;
@@ -144,16 +149,65 @@ function sendMessage() {
         return;
     }
 
+    const kbId = selectedKnowledgebase.kb_id;
+    let overallMessages = [];
+
+    // Check if retrieval is enabled
+    if (isRetrievalEnabled) {
+        // Send the query to the retrieval URL
+        const queryData = {
+            query: currentMessage,
+            user_id: userId,
+            kb_id: kbId,
+        };
+
+        fetch(retrievalUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(queryData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Retrieval response:', data);
+            const newDocs = data.data;
+            const combinedDocs = [...docs, ...newDocs];
+
+            if (combinedDocs.length > 5) {
+                docs = combinedDocs.slice(-5); // Keep only the last 5 documents
+            } else {
+                docs = combinedDocs; // Set docs to combined docs if <= 5
+            }
+
+            overallMessages.push({ role: 'system', content: '你是一个数据增强检索系统，系统会给你检索的实际信息，请务必根据检索的实际信息回答用户' });
+            docs.forEach(doc => {
+                overallMessages.push({ role: 'system', content: doc.content }); // Adjust as needed based on how you want to structure docs
+            });
+
+            // Now handle message sending
+            handleSendMessage(userId, selectedModel, overallMessages, currentMessage);
+        })
+        .catch(error => {
+            console.error('Error during retrieval:', error);
+        });
+    } else {
+        handleSendMessage(userId, selectedModel, overallMessages, currentMessage);
+    }
+}
+
+// Function to handle sending messages based on mode
+function handleSendMessage(userId, selectedModel, overallMessages, currentMessage) {
     // In multi-turn mode, add the message to the queue
     if (isMultiTurnEnabled) {
-        chatHistory.push({ role: 'user', content: currentMessage }); // Add message to queue
+        chatHistory.push({ role: 'user', content: overallMessages }); // Add message to queue
         addMessageToChat('user', currentMessage);
-        console.log("Message added to queue:", currentMessage);
-        sendToBackend(userId, selectedModel, chatHistory);
+        console.log("Message added to queue:", overallMessages);
+        sendToBackend(userId, selectedModel, overallMessages.concat(chatHistory));
     } else {
         // Single-turn mode: Send only the current message immediately
         addMessageToChat('user', currentMessage);
-        sendToBackend(userId, selectedModel, [{ role: 'user',content: currentMessage }]);
+        sendToBackend(userId, selectedModel, overallMessages.concat([{'role': 'user', 'content': currentMessage}]));
     }
     document.getElementById("message-input").value = '';
 }
