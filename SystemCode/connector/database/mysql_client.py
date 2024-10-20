@@ -326,7 +326,7 @@ class MySQLClient:
 
     def get_chat_information(self, user_id):
         query = """
-            SELECT api_key, base_url
+            SELECT api_key, base_url, model
             FROM User
             WHERE user_id = %s;
         """
@@ -334,13 +334,13 @@ class MySQLClient:
 
         return results
 
-    def update_user_chat_information(self, user_id, api_key, base_url):
+    def update_user_chat_information(self, user_id, api_key, base_url, model):
         query = """
             UPDATE User
-            SET api_key = %s, base_url = %s
+            SET api_key = %s, base_url = %s, model = %s
             WHERE user_id = %s;
         """
-        self.execute_query_(query, (api_key, base_url, user_id), commit=True)
+        self.execute_query_(query, (api_key, base_url, model, user_id), commit=True)
         return True
 
 if __name__ == '__main__':

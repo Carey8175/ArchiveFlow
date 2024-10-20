@@ -454,12 +454,12 @@ async def login(req: sanic_request):
 
     logging.info("[API]-[login] user_id: %s", user_id)
     return sanic_json({"code": 200, "msg": "success log in", "status": True, "user_id": user_id
-                       , "api_key": info[0][0], "base_url": info[0][1]})
+                       , "api_key": info[0][0], "base_url": info[0][1], "model": info[0][2]})
 
 
 async def update_user_chat_information(req: sanic_request):
     """
-    user_id, api_key, base_url
+    user_id, api_key, base_url, model
     update user chat information
     """
     user_id = safe_get(req, 'user_id')
@@ -478,7 +478,11 @@ async def update_user_chat_information(req: sanic_request):
     if not base_url:
         return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
 
-    mysql_client.update_user_chat_information(user_id, api_key, base_url)
+    model = safe_get(req, 'model')
+    if not model:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    mysql_client.update_user_chat_information(user_id, api_key, base_url, model)
     return sanic_json({"code": 200, "msg": "success update user chat information", "user_id": user_id, "api_key": api_key, "base_url": base_url})
 
 
@@ -564,7 +568,7 @@ async def chat_stream(req: sanic_request):
                               status=400)
 
     try:
-        api_key, base_url = mysql_client.get_chat_information(user_id)[0]
+        api_key, base_url, model = mysql_client.get_chat_information(user_id)[0]
     except IndexError:
         return sanic_json({"code": 2002, "msg": f'用户{user_id}未绑定API_KEY，请绑定API信息！'}, status=400)
 
