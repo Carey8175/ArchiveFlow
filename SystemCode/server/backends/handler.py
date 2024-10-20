@@ -567,7 +567,7 @@ async def chat_stream(req: sanic_request):
                               status=400)
 
     try:
-        api_key, base_url = mysql_client.get_chat_information(user_id)[0]
+        api_key, base_url, model = mysql_client.get_chat_information(user_id)[0]
     except IndexError:
         return sanic_json({"code": 2002, "msg": f'用户{user_id}未绑定API_KEY，请绑定API信息！'}, status=400)
 
