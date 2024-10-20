@@ -1,3 +1,10 @@
-from SystemCode.server.model_manager import ModelManager
+from SystemCode.server.backends.sanic_api import app
 
-model_manager = ModelManager()
+
+
+
+if __name__ == '__main__':
+    app.run(
+        host="0.0.0.0",
+        port=18777
+    )

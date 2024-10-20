@@ -8,14 +8,11 @@ import logging
 from openai import OpenAI
 from datetime import datetime
 
-from sanic.response import ResponseStream
 from sanic.response import json as sanic_json
-from sanic.response import text as sanic_text
 from sanic import request as sanic_request
 
 from SystemCode.configs.database import CONNECT_MODE
 from SystemCode.configs.basic import *
-# from SystemCode.core.file import File
 from SystemCode.utils.general_utils import *
 from SystemCode.connector.database.mysql_client import MySQLClient
 from SystemCode.connector.database.milvus_client import MilvusClient

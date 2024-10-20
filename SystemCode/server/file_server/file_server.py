@@ -1,6 +1,7 @@
 import os
 import logging
 import time
+import torch
 from paddleocr import PaddleOCR
 
 from SystemCode.core.file import File
@@ -15,7 +16,7 @@ logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(fil
 logging.info("[File System] Start the file system.")
 # ------------------ File System ------------------
 # check the file is embedded or not every 5 seconds
-FILE_SYSTEM_SLEEP_TIME = 5
+FILE_SYSTEM_SLEEP_TIME = 30
 current_file_path = os.path.abspath(__file__)
 # 获取当前文件的父级文件夹
 parent_directory = os.path.dirname(current_file_path)
@@ -28,7 +29,7 @@ model_name = "maidalun1020/bce-embedding-base_v1"
 class FileSystem:
     def __init__(self, model_manager: ModelManager):
         self.mysql_client = mysql_client.MySQLClient(CONNECT_MODE)
-        self.ocr_engine = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=False, show_log=True)
+        self.ocr_engine = PaddleOCR(use_angle_cls=True, lang="ch", use_gpu=torch.cuda.is_available(), show_log=False)
         # Initialize the embedding model and move it to the GPU if available
         self.model_manager = model_manager
 
