@@ -462,7 +462,7 @@ async def login(req: sanic_request):
 
 async def update_user_chat_information(req: sanic_request):
     """
-    user_id, api_key, base_url
+    user_id, api_key, base_url, model
     update user chat information
     """
     user_id = safe_get(req, 'user_id')
@@ -481,7 +481,11 @@ async def update_user_chat_information(req: sanic_request):
     if not base_url:
         return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
 
-    mysql_client.update_user_chat_information(user_id, api_key, base_url)
+    model = safe_get(req, 'model')
+    if not model:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    mysql_client.update_user_chat_information(user_id, api_key, base_url, model)
     return sanic_json({"code": 200, "msg": "success update user chat information", "user_id": user_id, "api_key": api_key, "base_url": base_url})
 
 
