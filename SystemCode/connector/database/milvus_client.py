@@ -13,7 +13,7 @@ import math
 import logging
 from itertools import groupby
 from typing import List
-from SystemCode.server.model_manager import ModelManager
+
 
 # ----------------- Logger -----------------
 logging.basicConfig(level='INFO', format='%(asctime)s - %(levelname)s - %(message)s', force=True)
@@ -118,7 +118,7 @@ class MilvusClient:
         except Exception as e:
             logging.error(e)
 
-    def __search_emb_sync(self, embs, expr='', model_manager: ModelManager = None, top_k=None, client_timeout=None, queries=None):
+    def __search_emb_sync(self, embs, expr='', model_manager=None, top_k=None, client_timeout=None, queries=None):
 
         if not top_k:
             top_k = self.top_k
@@ -141,7 +141,7 @@ class MilvusClient:
 
         return milvus_records_proc
 
-    def search_emb_async(self, embs, expr='', model_manager: ModelManager = None, top_k=None, client_timeout=None,
+    def search_emb_async(self, embs, expr='', model_manager=None, top_k=None, client_timeout=None,
                          queries=None):
         if not top_k:
             top_k = self.top_k
