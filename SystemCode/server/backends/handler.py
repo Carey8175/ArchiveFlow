@@ -5,7 +5,7 @@ import json
 import urllib
 import asyncio
 import logging
-from openai import OpenAI, api_key
+from openai import OpenAI
 from datetime import datetime
 
 from sanic.response import ResponseStream
