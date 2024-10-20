@@ -326,7 +326,7 @@ class MySQLClient:
 
     def get_chat_information(self, user_id):
         query = """
-            SELECT api_key, base_url
+            SELECT api_key, base_url, model
             FROM User
             WHERE user_id = %s;
         """

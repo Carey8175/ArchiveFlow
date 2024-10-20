@@ -457,7 +457,7 @@ async def login(req: sanic_request):
 
     logging.info("[API]-[login] user_id: %s", user_id)
     return sanic_json({"code": 200, "msg": "success log in", "status": True, "user_id": user_id
-                       , "api_key": info[0][0], "base_url": info[0][1]})
+                       , "api_key": info[0][0], "base_url": info[0][1], "model": info[0][2]})
 
 
 async def update_user_chat_information(req: sanic_request):
