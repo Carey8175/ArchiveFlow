@@ -67,7 +67,10 @@
                 <input type="text" id="base-url" placeholder="Enter Base URL">
 
                 <label for="model-select">Select Model:</label>
-                <select id="model-select"></select>
+                <div class="model-selection-container">
+                    <select id="model-select"></select>
+                    <input type="text" id="custom-model-input" placeholder="Enter custom model name" style="display:none;" />
+                </div>
                 <div class="token-limit">
                     <label for="token-limit">Response Limit (tokens):</label>
                     <input type="range" id="token-limit" min="1" max="1000" value="500">

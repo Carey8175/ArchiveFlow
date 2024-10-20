@@ -136,17 +136,17 @@ function loadFileList(e) {
 
                 let formattedFileSize;
                 if (file_size < 1024) {
-                    formattedFileSize = `${file_size} B`; // 小于 1 KB 时显示字节
+                    formattedFileSize = `${file_size} B`;
                 } else if (file_size < 1024 * 1024) {
-                    formattedFileSize = `${(file_size / 1024).toFixed(2)} KB`; // KB 显示
+                    formattedFileSize = `${(file_size / 1024).toFixed(2)} KB`;
                 } else {
-                    formattedFileSize = `${(file_size / (1024 * 1024)).toFixed(2)} MB`; // MB 显示
+                    formattedFileSize = `${(file_size / (1024 * 1024)).toFixed(2)} MB`;
                 }
 
                 let currentFileId = null;
                 const listItem = document.createElement("li");
                 const contextMenu = document.getElementById("context-menu");
-                listItem.textContent = `${file_name}, ${formattedDate}, ${formattedFileSize}`;
+                listItem.textContent = `${file_name}, ${formattedDate}, ${formattedFileSize}, ${status}`;
 
                 listItem.addEventListener("contextmenu", function (e) {
                     e.preventDefault();
@@ -291,7 +291,7 @@ function addUrl() {
                 loadFileList();
                 urlInput.value = '';
             } else {
-                alert("Error!");
+                alert(data.msg);
             }
         })
         .catch(error => {

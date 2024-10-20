@@ -5,7 +5,7 @@ const backendPort = "18777";
 
 const chatStreamUrl = `${backendHost}:${backendPort}/api/orag/chat_stream`; // Knowledgebase API base URL
 const updateChatInfoUrl = `${backendHost}:${backendPort}/api/orag/update/user_chat_information`; // Knowledgebase API base URL
-const retrievalUrl = `${backendHost}:${backendPort}/api/orag/retrieval`; // Adjust this according to your API endpoint
+const retrivalUrl = `${backendHost}:${backendPort}/api/orag/retrieval`; // Adjust this according to your API endpoint
 const chatContainer = document.getElementById('chat-box');
 const sendButton = document.getElementById('send-button');
 const modelSelect = document.getElementById('model-select');
@@ -23,15 +23,14 @@ const modelOptions = [
     "gpt-3.5-turbo-instruct", "gpt-4", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-2024-08-06",
     "chatgpt-4o-latest", "gpt-4o-mini", "gpt-4-0613", "gpt-4-turbo-preview", "gpt-4-0125-preview",
     "gpt-4-1106-preview", "gpt-4-vision-preview", "gpt-4-turbo", "gpt-4-turbo-2024-04-09",
-    "claude-3-5-sonnet-20240620"
+    "claude-3-5-sonnet-20240620", "deepseek-chat"
 ];
 
 let docs = [];
 let chatHistory = [];
 let selectedModel = null;
 let isMultiTurnEnabled = false;
-let isRetrievalEnabled = false;
-let overallMessages = [];
+let isRetrivalEnabled = false;
 
 modelSettingsButton.addEventListener('click', () => {
     modal.style.display = 'block';
@@ -42,14 +41,14 @@ closeButton.addEventListener('click', () => {
 });
 
 retrievalButton.addEventListener('click', () => {
-    isRetrievalEnabled = !isRetrievalEnabled; // Toggle the state
-    retrievalButton.classList.toggle('active', isRetrievalEnabled); // Update button style
+    isRetrivalEnabled = !isRetrivalEnabled; // Toggle the state
+    retrievalButton.classList.toggle('active', isRetrivalEnabled); // Update button style
 });
 
 confirmButton.addEventListener('click', () => {
     const apiKey = document.getElementById('api-key').value;
     const baseUrl = document.getElementById('base-url').value;
-    selectedModel = modelSelect.value;
+    const model = document.getElementById('model-select').value;
 
     if (apiKey && baseUrl) {
         const data = {};
@@ -63,19 +62,19 @@ confirmButton.addEventListener('click', () => {
                 user_id: getCookie('user_id'),
                 api_key: apiKey,
                 base_url: baseUrl,
+                model: model
             })
         })
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
+                localStorage.setItem('api-key', apiKey);
+                localStorage.setItem('base-url', baseUrl);
+                localStorage.setItem('model-select', model);
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-        localStorage.setItem('api-key', apiKey);
-        localStorage.setItem('base-url', baseUrl);
-        localStorage.setItem('model-select', selectedModel);
-
         document.getElementById("model-settings-modal").style.display = "none"; // Hide management interface
         console.log("User ID:", getCookie('user_id'), "API Key:", apiKey, "Base URL:", baseUrl, "Selected Model:", selectedModel);
     } else {
@@ -88,18 +87,12 @@ tokenLimit.addEventListener('input', () => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadStoredData();
+    // loadStoredData();
 
     // Check if model is selected
     if (!selectedModel) {
         alert("Please select a model before starting the chat.");
     }
-
-    modelSelect.addEventListener('change', function() {
-        // selectedModel = this.value;
-        selectedModel = this.value;
-        console.log("Selected Model:", selectedModel);
-    });
 
     multiTurnBtn.addEventListener('click', toggleMultiTurn);
     modelChoices();
@@ -150,10 +143,10 @@ function sendMessage() {
     }
 
     const kbId = selectedKnowledgebase.kb_id;
-    let overallMessages = [];
+    let retrivalMessages = [];
 
     // Check if retrieval is enabled
-    if (isRetrievalEnabled) {
+    if (isRetrivalEnabled) {
         // Send the query to the retrieval URL
         const queryData = {
             query: currentMessage,
@@ -161,7 +154,7 @@ function sendMessage() {
             kb_id: kbId,
         };
 
-        fetch(retrievalUrl, {
+        fetch(retrivalUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -170,7 +163,7 @@ function sendMessage() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Retrieval response:', data);
+            console.log('Retrival response:', data);
             const newDocs = data.data;
             const combinedDocs = [...docs, ...newDocs];
 
@@ -180,35 +173,44 @@ function sendMessage() {
                 docs = combinedDocs; // Set docs to combined docs if <= 5
             }
 
-            overallMessages.push({ role: 'system', content: '你是一个数据增强检索系统，系统会给你检索的实际信息，请务必根据检索的实际信息回答用户' });
+            retrivalMessages.push({ role: 'system', content: '你是一个数据增强检索系统，系统会给你检索的实际信息，请务必根据检索的实际信息回答用户' });
+
             docs.forEach(doc => {
-                overallMessages.push({ role: 'system', content: doc.content }); // Adjust as needed based on how you want to structure docs
+                retrivalMessages.push({ role: 'system', content: doc.content }); // Adjust as needed based on how you want to structure docs
             });
 
             // Now handle message sending
-            handleSendMessage(userId, selectedModel, overallMessages, currentMessage);
+            handleSendMessage(userId, selectedModel, retrivalMessages, currentMessage);
         })
         .catch(error => {
             console.error('Error during retrieval:', error);
         });
     } else {
-        handleSendMessage(userId, selectedModel, overallMessages, currentMessage);
+        retrivalMessages.push({ role: 'system', content: '你是一个数据增强检索系统，系统会给你检索的实际信息，请务必根据检索的实际信息回答用户' });
+
+        docs.forEach(doc => {
+            retrivalMessages.push({ role: 'system', content: doc.content }); // Adjust as needed based on how you want to structure docs
+        });
+
+        handleSendMessage(userId, selectedModel, retrivalMessages, currentMessage);
     }
 }
 
-
 // Function to handle sending messages based on mode
-function handleSendMessage(userId, selectedModel, overallMessages, currentMessage) {
+function handleSendMessage(userId, selectedModel, retrivalMessages, currentMessage) {
+    const messagesToSend = [...retrivalMessages];
+
     // In multi-turn mode, add the message to the queue
     if (isMultiTurnEnabled) {
-        chatHistory.push({ role: 'user', content: overallMessages }); // Add message to queue
+        chatHistory.push({ role: 'user', content: currentMessage });
+        messagesToSend.push(...chatHistory);
         addMessageToChat('user', currentMessage);
-        console.log("Message added to queue:", overallMessages);
-        sendToBackend(userId, selectedModel, overallMessages.concat(chatHistory));
+        sendToBackend(userId, selectedModel, messagesToSend);
     } else {
         // Single-turn mode: Send only the current message immediately
+        messagesToSend.push({ role: 'user', content: currentMessage });
         addMessageToChat('user', currentMessage);
-        sendToBackend(userId, selectedModel, overallMessages.concat([{'role': 'user', 'content': currentMessage}]));
+        sendToBackend(userId, selectedModel, messagesToSend);
     }
     document.getElementById("message-input").value = '';
 }
@@ -265,7 +267,11 @@ function addMessageToChat(role, message) {
 }
 
 function modelChoices() {
+    const customInput = document.getElementById('custom-model-input');
+    customInput.style.display = 'none';
+
     modelSelect.innerHTML = '';
+
     modelOptions.forEach(model => {
         const option = document.createElement('option');
         option.value = model;
@@ -273,10 +279,42 @@ function modelChoices() {
         modelSelect.appendChild(option);
     })
 
-    if (modelOptions.length > 0) {
-        modelSelect.value = modelOptions[0];
-        selectedModel = modelOptions[0];
+    const customOption = document.createElement('option');
+    customOption.value = 'custom';
+    customOption.textContent = 'custom model';
+    modelSelect.appendChild(customOption);
+
+    const savedModel = localStorage.getItem('model-select');
+
+    if (savedModel !== "undefined" && savedModel !== "null") {
+        if (!modelOptions.includes(savedModel)) {
+            modelSelect.value = 'custom';
+            customInput.style.display = 'inline-block';
+            customInput.value = savedModel;
+        } else {
+            modelSelect.value = savedModel;
+        }
     }
+
+    modelSelect.addEventListener('change', function() {
+        if (modelSelect.value !== 'custom') {
+            customInput.style.display = 'none';
+            customInput.value = '';
+            localStorage.setItem('model-select', modelSelect.value);
+        } else {
+            customInput.style.display = 'inline-block';
+        }
+    });
+
+    customInput.addEventListener('input', function() {
+        if (customInput.value.trim() !== '') {
+            localStorage.setItem('model-select', customInput.value);
+        }
+    });
+
+    document.getElementById('api-key').value = localStorage.getItem('api-key')
+    document.getElementById('base-url').value = localStorage.getItem('base-url')
+
 }
 
 document.getElementById("message-input").addEventListener("keydown", function(e) {
