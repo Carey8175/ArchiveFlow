@@ -5,7 +5,7 @@ import json
 import urllib
 import asyncio
 import logging
-from openai import OpenAI
+from openai import OpenAI, api_key
 from datetime import datetime
 
 from sanic.response import ResponseStream
@@ -453,8 +453,11 @@ async def login(req: sanic_request):
     result = mysql_client.execute_query_(sql, (user_name,), fetch=True)
     user_id = result[0][0]
 
+    info = mysql_client.get_chat_information(user_id)
+
     logging.info("[API]-[login] user_id: %s", user_id)
-    return sanic_json({"code": 200, "msg": "success log in", "status": True, "user_id": user_id})
+    return sanic_json({"code": 200, "msg": "success log in", "status": True, "user_id": user_id
+                       , "api_key": info[0][0], "base_url": info[0][1]})
 
 
 async def update_user_chat_information(req: sanic_request):
