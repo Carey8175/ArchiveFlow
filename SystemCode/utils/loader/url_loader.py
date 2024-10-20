@@ -83,8 +83,11 @@ class URLToTextConverter(UnstructuredFileLoader):
         except Exception as e:
             print(f"Error fetching links for {url}: {e}")
 
+        tmp_file_name = self._sanitize_filename(url)[:30] if len(self._sanitize_filename(url)) > 50 \
+            else self._sanitize_filename(url)
 
-        output_path = os.path.join(self.output_dir, self._sanitize_filename(url) + ".txt")
+        output_path = os.path.join(self.output_dir, tmp_file_name + ".txt")
+
         with open(output_path, "w", encoding="utf-8") as f:
             f.write('/n'.join(combined_text))
 
