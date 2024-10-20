@@ -13,10 +13,11 @@ import math
 import logging
 from itertools import groupby
 from typing import List
+from SystemCode.configs.basic import LOG_LEVEL
 
 
 # ----------------- Logger -----------------
-logging.basicConfig(level='INFO', format='%(asctime)s - %(levelname)s - %(message)s', force=True)
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', force=True)
 
 
 class MilvusFailed(Exception):

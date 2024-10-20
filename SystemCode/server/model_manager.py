@@ -3,9 +3,10 @@ import numpy as np
 from BCEmbedding import EmbeddingModel, RerankerModel
 from SystemCode.connector.database.milvus_client import MilvusClient
 from SystemCode.configs.database import CONNECT_MODE
+from SystemCode.configs.basic import LOG_LEVEL
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', force=True)
 
 
 class ModelManager:

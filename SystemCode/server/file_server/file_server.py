@@ -7,10 +7,11 @@ from SystemCode.core.file import File
 from SystemCode.server.model_manager import ModelManager
 from SystemCode.connector.database import mysql_client, milvus_client
 from SystemCode.configs.database import CONNECT_MODE
+from SystemCode.configs.basic import LOG_LEVEL
 
 
 # ------------------ Logging ------------------
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', force=True)
 logging.info("[File System] Start the file system.")
 # ------------------ File System ------------------
 # check the file is embedded or not every 5 seconds

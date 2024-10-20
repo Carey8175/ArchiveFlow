@@ -15,6 +15,7 @@ from SystemCode.connector.database.milvus_client import MilvusClient
 from SystemCode.connector.database.mysql_client import MySQLClient
 from SystemCode.configs.database import CONNECT_MODE
 from SystemCode.configs.basic import FILE_SERVER_PORT, TASK_TIMEOUT
+from SystemCode.configs.basic import LOG_LEVEL
 
 
 # ------------------ File Server ------------------
@@ -69,7 +70,7 @@ def clean_up_tasks():
         time.sleep(60)  # 每60秒检查一次任务状态
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', force=True)
 
 file_server_app = Sanic("FileServer")
 logging.info("File Server Starting")

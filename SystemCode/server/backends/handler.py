@@ -20,9 +20,10 @@ from SystemCode.utils.general_utils import *
 from SystemCode.connector.database.mysql_client import MySQLClient
 from SystemCode.connector.database.milvus_client import MilvusClient
 from SystemCode.server.init import model_manager
+from SystemCode.configs.basic import LOG_LEVEL
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', force=True)
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', force=True)
 # init Mysql client
 mysql_client = MySQLClient(CONNECT_MODE)
 
