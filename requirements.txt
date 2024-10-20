@@ -1,3 +1,8 @@
+dual
+data
+tight
+prox
+common
 pymysql
 pandas
 langchain
@@ -12,8 +17,10 @@ cryptography
 BCEmbedding
 pymilvus
 paddlepaddle
+albumentations
 paddleocr
 tiktoken
 requests
 bs4
+openai
 
