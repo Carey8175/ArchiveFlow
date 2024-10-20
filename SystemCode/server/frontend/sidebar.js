@@ -2,7 +2,7 @@ import {deleteKnowledgebase, manageKnowledgebase} from './baseManage.js';
 import {goToChatInterface} from './chatInterface.js';
 
 const backendHost = "http://47.108.135.173";
-const backendPort = "8777";
+const backendPort = "18777";
 const knowledgebaseUrl = `${backendHost}:${backendPort}/api/orag/select/knowledge_base`; // Knowledgebase API base URL
 const addKnowledgebaseUrl = `${backendHost}:${backendPort}/api/orag/add/knowledge_base`; // Knowledgebase API base URL
 const knowledgebaseList = document.getElementById("knowledgebase-list");

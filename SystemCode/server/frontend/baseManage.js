@@ -1,7 +1,7 @@
 import {selectedKnowledgebase, loadKnowledgebases} from "./sidebar.js";
 
 const backendHost = "http://47.108.135.173";
-const backendPort = "8777";
+const backendPort = "18777";
 const fileListUrl = `${backendHost}:${backendPort}/api/orag/select/files`; // Knowledgebase API base URL
 const deleteFileUrl = `${backendHost}:${backendPort}/api/orag/delete/file`; // Knowledgebase API base URL
 const uploadFileUrl = `${backendHost}:${backendPort}/api/orag/add/document`; // Knowledgebase API base URL

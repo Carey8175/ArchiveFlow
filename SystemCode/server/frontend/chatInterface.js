@@ -1,9 +1,12 @@
 import { selectedKnowledgebase } from "./sidebar.js";
 
 const backendHost = "http://47.108.135.173";
-const backendPort = "8777";
+const backendPort = "18777";
 
 const chatStreamUrl = `${backendHost}:${backendPort}/api/orag/chat_stream`; // Knowledgebase API base URL
+const updateChatInfoUrl = `${backendHost}:${backendPort}/api/orag/update/user_chat_information`; // Knowledgebase API base URL
+const chatContainer = document.getElementById('chat-box');
+const sendButton = document.getElementById('send-button');
 const modelSelect = document.getElementById('model-select');
 const multiTurnBtn = document.getElementById('multi-turn-button');
 const modelSettingsButton = document.getElementById('model-settings-button');
@@ -36,20 +39,38 @@ closeButton.addEventListener('click', () => {
 confirmButton.addEventListener('click', () => {
     const apiKey = document.getElementById('api-key').value;
     const baseUrl = document.getElementById('base-url').value;
-    const selectedModel = document.getElementById('model-select').value;
+    selectedModel = modelSelect.value;
 
-    if (!apiKey || !baseUrl){
+    if (apiKey && baseUrl) {
+        const data = {};
+
+        fetch(updateChatInfoUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: getCookie('user_id'),
+                api_key: apiKey,
+                base_url: baseUrl,
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        localStorage.setItem('api-key', apiKey);
+        localStorage.setItem('base-url', baseUrl);
+        localStorage.setItem('model-select', selectedModel);
+
+        document.getElementById("model-settings-modal").style.display = "none"; // Hide management interface
+        console.log("User ID:", getCookie('user_id'), "API Key:", apiKey, "Base URL:", baseUrl, "Selected Model:", selectedModel);
+    } else {
         alert("Please enter your api key and base url")
     }
-
-    console.log("User ID:", getCookie('user_name'), "API Key:", apiKey, "Base URL:", baseUrl, "Selected Model:", selectedModel);
-    // document.getElementById("model-settings-modal").style.display = "none"; // Hide management interface
-
-});
-
-modelSelect.addEventListener('change', () => {
-    const selectedModel = modelSelect.value;
-    console.log("Selected Model:", selectedModel);
 });
 
 tokenLimit.addEventListener('input', () => {
@@ -57,6 +78,7 @@ tokenLimit.addEventListener('input', () => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    loadStoredData();
 
     // Check if model is selected
     if (!selectedModel) {
@@ -64,7 +86,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     modelSelect.addEventListener('change', function() {
+        // selectedModel = this.value;
         selectedModel = this.value;
+        console.log("Selected Model:", selectedModel);
     });
 
     multiTurnBtn.addEventListener('click', toggleMultiTurn);
@@ -74,17 +98,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.getElementById("send-button").addEventListener("click", sendMessage);
 
+function loadStoredData() {
+    const storedApiKey = localStorage.getItem('api-key');
+    const storedBaseUrl = localStorage.getItem('base-url');
+    const storedModel = localStorage.getItem('model-select');
+
+    if (storedApiKey) {
+        document.getElementById('api-key').value = storedApiKey;
+    }
+    if (storedBaseUrl) {
+        document.getElementById('base-url').value = storedBaseUrl;
+    }
+    if (storedModel) {
+        modelSelect.value = storedModel;
+        selectedModel = storedModel;
+    }
+}
+
 function toggleMultiTurn() {
-    console.log("multi-turned!")
     isMultiTurnEnabled = !isMultiTurnEnabled;
+
     multiTurnBtn.title = isMultiTurnEnabled ? "Multi-turn conversation is enabled" : "Multi-turn conversation is disabled";
     multiTurnBtn.classList.toggle('active', isMultiTurnEnabled);
+
+    if (isMultiTurnEnabled) {
+        multiTurnBtn.style.backgroundColor = "blue";
+    } else {
+        multiTurnBtn.style.backgroundColor = "grey";
+    }
 }
 
 // Function to handle sending messages
 function sendMessage() {
-    const userId = getCookie('user_name')
+    const userId = getCookie('user_id');
     const currentMessage = document.getElementById("message-input").value.trim(); // Get the message
+    const selectedModel = document.getElementById("model-select").value;
 
     if (!selectedModel) {
         alert("Please select a model.");
@@ -98,46 +146,58 @@ function sendMessage() {
 
     // In multi-turn mode, add the message to the queue
     if (isMultiTurnEnabled) {
-        chatHistory.push({ role: 'user', message: messageInput }); // Add message to queue
+        chatHistory.push({ role: 'user', content: currentMessage }); // Add message to queue
         addMessageToChat('user', currentMessage);
         console.log("Message added to queue:", currentMessage);
         sendToBackend(userId, selectedModel, chatHistory);
     } else {
         // Single-turn mode: Send only the current message immediately
         addMessageToChat('user', currentMessage);
-        sendToBackend(userId, selectedModel, [{ role: 'user', message: currentMessage }]);
+        sendToBackend(userId, selectedModel, [{ role: 'user',content: currentMessage }]);
     }
     document.getElementById("message-input").value = '';
 }
 
 // Function to connect to chatStream mode
-function sendToBackend(userId, model, messageList) {
+async function sendToBackend(userId, model, messageList) {
+    sendButton.disabled = true;
     // Send a request to chatStreamUrl
-    fetch(chatStreamUrl, {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            user_id: userId,
-            model: model,
-            message: messageList,
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Message sent to backend:", data);
-        const assistantMessage = data.message;  // Get assistant's response from backend
-        addMessageToChat('assistant', assistantMessage);  // Display assistant's response
+    const formData = new FormData();
 
-        if (isMultiTurnEnabled) {
-            chatHistory.push({ role: 'assistant', message: assistantMessage });  // Add assistant's response to chat history
+    formData.append("user_id", userId);
+    formData.append("messages", JSON.stringify(messageList));
+    formData.append("model", model);
+    console.log("FormData being sent:", Array.from(formData.entries()));
+
+    try {
+        const response = await fetch(chatStreamUrl, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-    })
-    .catch(error => {
-        console.error("Error sending message:", error);
-        alert("Error sending message.");
-    });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let done = false;
+
+        while (!done) {
+            const {value, done: readerDone} = await reader.read();
+            done = readerDone;
+
+            if (value) {
+                const chunk = decoder.decode(value, {stream: true});
+                // Append each chunk to the chat container
+                chatContainer.innerHTML += chunk;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+    }catch (error){
+        chatContainer.innerHTML = 'Error: ' + error.message;
+    }
+    sendButton.disabled = false;
 }
 
 // Function to display messages in the chat box
@@ -156,7 +216,12 @@ function modelChoices() {
         option.value = model;
         option.textContent = model;
         modelSelect.appendChild(option);
-    });
+    })
+
+    if (modelOptions.length > 0) {
+        modelSelect.value = modelOptions[0];
+        selectedModel = modelOptions[0];
+    }
 }
 
 document.getElementById("message-input").addEventListener("keydown", function(e) {
