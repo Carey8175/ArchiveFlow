@@ -563,3 +563,30 @@ async def chat_stream(req: sanic_request):
     await response.eof()
 
 
+async def retrieval(req: sanic_request):
+    """
+    user_id, kb_id, query
+    :param req:
+    :return:
+    """
+    user_id = safe_get(req, 'user_id')
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+    logging.info("[API]-[retrieval] user_id: %s", user_id)
+
+    kb_id = safe_get(req, 'kb_id')
+    if kb_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    not_exist_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
+    if not_exist_kb_ids:
+        msg = "invalid kb_id: {}, please check...".format(not_exist_kb_ids)
+        return sanic_json({"code": 2001, "msg": msg, "data": [{}]})
+
+    query = safe_get(req, 'query')
+    if not query:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+
