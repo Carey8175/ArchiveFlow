@@ -19,6 +19,7 @@ from SystemCode.configs.basic import *
 from SystemCode.utils.general_utils import *
 from SystemCode.connector.database.mysql_client import MySQLClient
 from SystemCode.connector.database.milvus_client import MilvusClient
+from SystemCode.server.init import model_manager
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', force=True)
@@ -588,5 +589,17 @@ async def retrieval(req: sanic_request):
     query = safe_get(req, 'query')
     if not query:
         return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    results = model_manager.retrieval(user_id, kb_id, query)
+
+    if not results:
+        return sanic_json({"code": 2003, "msg": "未找到相关文档", "data": []})
+
+    data = []
+    for res in results:
+        for doc in res:
+            data.append({"file_id": doc.metadata["file_id"], "file_name": doc.metadata["file_name"], "score": doc.metadata["score"], "content": doc.page_content})
+
+    return sanic_json({"code": 200, "msg": "success", "data": data})
 
 
