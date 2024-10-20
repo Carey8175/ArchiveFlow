@@ -19,9 +19,11 @@ from SystemCode.configs.basic import *
 from SystemCode.utils.general_utils import *
 from SystemCode.connector.database.mysql_client import MySQLClient
 from SystemCode.connector.database.milvus_client import MilvusClient
+from SystemCode.server.init import model_manager
+from SystemCode.configs.basic import LOG_LEVEL
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', force=True)
 # init Mysql client
 mysql_client = MySQLClient(CONNECT_MODE)
 
@@ -455,6 +457,32 @@ async def login(req: sanic_request):
     return sanic_json({"code": 200, "msg": "success log in", "status": True, "user_id": user_id})
 
 
+async def update_user_chat_information(req: sanic_request):
+    """
+    user_id, api_key, base_url
+    update user chat information
+    """
+    user_id = safe_get(req, 'user_id')
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+    logging.info("[API]-[update user chat information] user_id: %s", user_id)
+
+    api_key = safe_get(req, 'api_key')
+    if not api_key:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    base_url = safe_get(req, 'base_url')
+    if not base_url:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    mysql_client.update_user_chat_information(user_id, api_key, base_url)
+    return sanic_json({"code": 200, "msg": "success update user chat information", "user_id": user_id, "api_key": api_key, "base_url": base_url})
+
+
+
 # --------chatbot--------
 async def chat(req: sanic_request):
     """
@@ -561,5 +589,44 @@ async def chat_stream(req: sanic_request):
         await response.send(content)
 
     await response.eof()
+
+
+async def retrieval(req: sanic_request):
+    """
+    user_id, kb_id, query
+    :param req:
+    :return:
+    """
+    user_id = safe_get(req, 'user_id')
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+    logging.info("[API]-[retrieval] user_id: %s", user_id)
+
+    kb_id = safe_get(req, 'kb_id')
+    if kb_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    not_exist_kb_ids = mysql_client.check_kb_exist(user_id, [kb_id])
+    if not_exist_kb_ids:
+        msg = "invalid kb_id: {}, please check...".format(not_exist_kb_ids)
+        return sanic_json({"code": 2001, "msg": msg, "data": [{}]})
+
+    query = safe_get(req, 'query')
+    if not query:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    results = model_manager.retrieval(user_id, kb_id, query)
+
+    if not results:
+        return sanic_json({"code": 2003, "msg": "未找到相关文档", "data": []})
+
+    data = []
+    for res in results:
+        for doc in res:
+            data.append({"file_id": doc.metadata["file_id"], "file_name": doc.metadata["file_name"], "score": doc.metadata["score"], "content": doc.page_content})
+
+    return sanic_json({"code": 200, "msg": "success", "data": data})
 
 

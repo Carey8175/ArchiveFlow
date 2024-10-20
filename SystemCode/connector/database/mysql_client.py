@@ -6,7 +6,7 @@ from SystemCode.configs.database import *
 from SystemCode.configs.basic import LOG_LEVEL
 
 # ----------------- Logger -----------------
-logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', force=True)
 
 
 # ----------------- MySQL Client -----------------
@@ -255,7 +255,7 @@ class MySQLClient:
         return result
 
     def check_kb_exist_by_name(self, user_id, new_kb_name):
-        query = "SELECT 1 FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s"
+        query = "SELECT 1 FROM KnowledgeBase WHERE kb_name = %s AND user_id = %s AND deleted = 0"
         result = self.execute_query_(query, (new_kb_name, user_id), fetch=True)
         return bool(result)
 
@@ -314,10 +314,10 @@ class MySQLClient:
     def update_status(self, file_id, status):
         query = """
             UPDATE File
-            SET status = %s, chunk_size = %s
+            SET status = %s
             WHERE file_id = %s;
         """
-        self.execute_query_(query, (status, chunk_size, file_id), commit=True)
+        self.execute_query_(query, (status, file_id), commit=True)
 
         logging.info("[SUCCESS] File status updated")
 
@@ -333,6 +333,15 @@ class MySQLClient:
         results = self.execute_query_(query, (user_id,), fetch=True)
 
         return results
+
+    def update_user_chat_information(self, user_id, api_key, base_url):
+        query = """
+            UPDATE User
+            SET api_key = %s, base_url = %s
+            WHERE user_id = %s;
+        """
+        self.execute_query_(query, (api_key, base_url, user_id), commit=True)
+        return True
 
 if __name__ == '__main__':
     client = MySQLClient('remote')

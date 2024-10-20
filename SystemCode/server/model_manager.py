@@ -1,9 +1,12 @@
 import logging
 import numpy as np
 from BCEmbedding import EmbeddingModel, RerankerModel
+from SystemCode.connector.database.milvus_client import MilvusClient
+from SystemCode.configs.database import CONNECT_MODE
+from SystemCode.configs.basic import LOG_LEVEL
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', force=True)
 
 
 class ModelManager:
@@ -26,12 +29,39 @@ class ModelManager:
 
         return rerank_results
 
+    def retrieval(self, user_id, kb_ids, query):
+        q_embedding = self.embedding_model.encode([query])
+
+        milvus_client = MilvusClient(
+            user_id=user_id,
+            kb_ids=kb_ids,
+            mode=CONNECT_MODE
+        )
+
+        retrieval_docs = milvus_client.search_emb_async(
+            embs=q_embedding,
+            model_manager=self,
+            top_k=100,
+            queries=[query]
+        )
+
+        return retrieval_docs
+
 
 if __name__ == '__main__':
+
+
+
     class Doc:
         def __init__(self, page_content):
             self.page_content = page_content
 
     model_manager = ModelManager()
+    docs = model_manager.retrieval(
+        user_id='U3e6e0a3b608648e39cf8f9c37ec57c8f',
+        kb_ids=['KB67225a562f6c4594914b76c20388c477'],
+        query="什么是machine learning"
+    )
+
     print(model_manager.get_embedding([Doc("hello world")]))
     print(model_manager.rerank("hello", ["hello world", "bird"]))

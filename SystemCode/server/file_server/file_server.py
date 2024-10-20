@@ -7,9 +7,12 @@ from SystemCode.core.file import File
 from SystemCode.server.model_manager import ModelManager
 from SystemCode.connector.database import mysql_client, milvus_client
 from SystemCode.configs.database import CONNECT_MODE
+from SystemCode.configs.basic import LOG_LEVEL
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# ------------------ Logging ------------------
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', force=True)
+logging.info("[File System] Start the file system.")
 # ------------------ File System ------------------
 # check the file is embedded or not every 5 seconds
 FILE_SYSTEM_SLEEP_TIME = 5
@@ -50,6 +53,15 @@ class FileSystem:
                     the_file = File(file_id=file[0], kb_id=file[1], file_name=file[3], file_path=file[4])
 
                 docs = the_file.split_file(self.ocr_engine)
+                # docs = []
+                if not docs:
+                    self.mysql_client.update_status(
+                        file_id=file[0],
+                        status='error'
+                    )
+                    logging.error(f'[File System] Fail to split the file: {file[3]}')
+                    continue
+
                 embed = self.model_manager.get_embedding(docs)
 
                 # save the embedding to the database
