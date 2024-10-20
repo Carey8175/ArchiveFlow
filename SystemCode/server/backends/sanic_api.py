@@ -70,6 +70,7 @@ app.add_route(check_file_list, "/api/orag/select/files", methods=['POST'])  # ta
 # update ------------------------------------------------------------------------------------------------
 app.add_route(update_user_name, "/api/orag/update/user_name", methods=['POST'])  # tags=["更新用户名"]
 app.add_route(update_knowledge_base_name, "/api/orag/update/kb_name", methods=['POST'])  # tags=["更新知识库名"]
+app.add_route(update_user_chat_information, "/api/orag/update/user_chat_information", methods=['POST'])  # tags=["更新用户聊天信���"]
 
 # search ------------------------------------------------------------------------------------------------
 app.add_route(login, "/api/orag/search/login", methods=['POST'])  # tags=["登录"]

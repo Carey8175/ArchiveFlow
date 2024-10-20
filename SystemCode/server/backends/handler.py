@@ -456,6 +456,32 @@ async def login(req: sanic_request):
     return sanic_json({"code": 200, "msg": "success log in", "status": True, "user_id": user_id})
 
 
+async def update_user_chat_information(req: sanic_request):
+    """
+    user_id, api_key, base_url
+    update user chat information
+    """
+    user_id = safe_get(req, 'user_id')
+    if user_id is None:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+    is_valid = validate_user_id(user_id)
+    if not is_valid:
+        return sanic_json({"code": 2005, "msg": get_invalid_user_id_msg(user_id=user_id)})
+    logging.info("[API]-[update user chat information] user_id: %s", user_id)
+
+    api_key = safe_get(req, 'api_key')
+    if not api_key:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    base_url = safe_get(req, 'base_url')
+    if not base_url:
+        return sanic_json({"code": 2002, "msg": f'输入非法！request.json：{req.json}，请检查！'})
+
+    mysql_client.update_user_chat_information(user_id, api_key, base_url)
+    return sanic_json({"code": 200, "msg": "success update user chat information", "user_id": user_id, "api_key": api_key, "base_url": base_url})
+
+
+
 # --------chatbot--------
 async def chat(req: sanic_request):
     """

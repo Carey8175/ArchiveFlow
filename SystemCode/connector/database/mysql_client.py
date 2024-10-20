@@ -334,6 +334,15 @@ class MySQLClient:
 
         return results
 
+    def update_user_chat_information(self, user_id, api_key, base_url):
+        query = """
+            UPDATE User
+            SET api_key = %s, base_url = %s
+            WHERE user_id = %s;
+        """
+        self.execute_query_(query, (api_key, base_url, user_id), commit=True)
+        return True
+
 if __name__ == '__main__':
     client = MySQLClient('remote')
     client.check_kb_exist('1', ['1'])
