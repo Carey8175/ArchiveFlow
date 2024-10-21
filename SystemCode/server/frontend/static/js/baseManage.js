@@ -28,11 +28,25 @@ export function manageKnowledgebase(selectedKnowledgebase) {
     };
 
     document.getElementById("upload-button").onclick = function() {
-        uploadFile(selectedKnowledgebase);
+        const uploadButton = document.getElementById("upload-button");
+        uploadButton.disabled = true;
+        uploadFile(selectedKnowledgebase).then(() => {
+            uploadButton.disabled = false;
+        }).catch((error) => {
+            console.error("Error during file upload:", error);
+            uploadButton.disabled = false;
+        });
     };
 
     document.getElementById("add-url-button").onclick = function() {
-        addUrl(selectedKnowledgebase);
+        const addButton = document.getElementById("add-url-button");
+
+        addUrl(selectedKnowledgebase).then(() => {
+            addButton.disabled = false;
+        }).catch((error) => {
+            console.error("Error during file upload:", error);
+            addButton.disabled = false;
+        });
     };
 
     loadFileList();

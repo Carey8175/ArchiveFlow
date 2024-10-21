@@ -6,6 +6,7 @@ const backendPort = "18777";
 const chatStreamUrl = `${backendHost}:${backendPort}/api/orag/chat_stream`; // Knowledgebase API base URL
 const updateChatInfoUrl = `${backendHost}:${backendPort}/api/orag/update/user_chat_information`; // Knowledgebase API base URL
 const retrivalUrl = `${backendHost}:${backendPort}/api/orag/retrieval`; // Adjust this according to your API endpoint
+const messageInput = document.getElementById("message-input");
 const chatContainer = document.getElementById('chat-box');
 const sendButton = document.getElementById('send-button');
 const modelSelect = document.getElementById('model-select');
@@ -158,6 +159,7 @@ function sendMessage() {
     const kbId = selectedKnowledgebase.kb_id;
     let retrivalMessages = [];
 
+    sendButton.disabled = true;
     // Check if retrieval is enabled
     if (isRetrivalEnabled) {
         // Send the query to the retrieval URL
@@ -207,6 +209,7 @@ function sendMessage() {
 
         handleSendMessage(userId, selectedModel, retrivalMessages, currentMessage);
     }
+    sendButton.disabled = false;
 }
 
 // Function to handle sending messages based on mode
@@ -230,7 +233,6 @@ function handleSendMessage(userId, selectedModel, retrivalMessages, currentMessa
 
 // Function to connect to chatStream mode
 async function sendToBackend(userId, model, messageList) {
-    sendButton.disabled = true;
     // Send a request to chatStreamUrl
     const formData = new FormData();
 
@@ -270,7 +272,6 @@ async function sendToBackend(userId, model, messageList) {
     }catch (error){
         chatContainer.innerHTML = 'Error: ' + error.message;
     }
-    sendButton.disabled = false;
 }
 
 // Function to display messages in the chat box
@@ -333,17 +334,32 @@ function modelChoices() {
 
 }
 
-document.getElementById("message-input").addEventListener("keydown", function(e) {
-    if (e.key === "Enter") {
+let isComposing = false;
+
+messageInput.addEventListener('compositionstart', function() {
+    isComposing = true;
+});
+
+messageInput.addEventListener('compositionend', function() {
+    isComposing = false;
+});
+
+messageInput.addEventListener("keydown", function(event) {
+    if (event.key === 'Enter' && !isComposing) {
+        event.preventDefault();
         sendMessage();
     }
 });
 
 document.getElementById("new-chat-button").addEventListener("click", function() {
-    chatHistory = [];  // Reset chat history
-    document.getElementById("chat-box").innerHTML = '';  // Clear the chat display
-    document.getElementById("message-input").value = '';  // Clear the input field
-    alert("New conversation started!");  // Optional alert to notify the user
+    const confirmNewChat = confirm("Are you sure you want to start a new conversation? This will clear the chat history.");
+
+    if (confirmNewChat) {
+        chatHistory = [];  // Reset chat history
+        document.getElementById("chat-box").innerHTML = '';  // Clear the chat display
+        document.getElementById("message-input").value = '';  // Clear the input field
+        alert("New conversation started!");  // Optional alert to notify the user
+    }
 });
 
 export function goToChatInterface(knowledgebase) {
