@@ -38,6 +38,8 @@ def run_fe():
 
 
 if __name__ == '__main__':
+    multiprocessing.set_start_method('spawn')
+
     process1 = multiprocessing.Process(target=run_fe)
     process2 = multiprocessing.Process(target=run_be)
 
