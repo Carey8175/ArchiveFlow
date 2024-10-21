@@ -30,6 +30,9 @@ document.getElementById("login-form").addEventListener("submit", function (event
                 // localStorage.setItem("user_id", data.user_id); // Store userid
                 setCookie('user_id', data.user_id, 7);
                 localStorage.setItem('user_name', user_name);
+                localStorage.setItem('api-key', data.api_key);
+                localStorage.setItem('base-url', data.base_url);
+                localStorage.setItem('model-select', data.model);
                 window.location.href = "chat"; // Redirect to database page
             } else {
                 // Login failed, ask if user wants to create a new username
