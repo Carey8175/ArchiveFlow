@@ -50,6 +50,13 @@ confirmButton.addEventListener('click', () => {
     const baseUrl = document.getElementById('base-url').value;
     const model = document.getElementById('model-select').value;
 
+    let selectedModel;
+    if (document.getElementById("model-select").value === "custom") {
+        selectedModel = document.getElementById("custom-model-input").value;
+    } else {
+        selectedModel = document.getElementById("model-select").value;
+    }
+
     if (apiKey && baseUrl) {
         const data = {};
 
@@ -62,7 +69,7 @@ confirmButton.addEventListener('click', () => {
                 user_id: getCookie('user_id'),
                 api_key: apiKey,
                 base_url: baseUrl,
-                model: model
+                model: selectedModel
             })
         })
             .then(response => response.json())
@@ -70,7 +77,7 @@ confirmButton.addEventListener('click', () => {
                 console.log('Success:', data);
                 localStorage.setItem('api-key', apiKey);
                 localStorage.setItem('base-url', baseUrl);
-                localStorage.setItem('model-select', model);
+                localStorage.setItem('model-select', selectedModel);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -127,7 +134,13 @@ function toggleMultiTurn() {
 function sendMessage() {
     const userId = getCookie('user_id');
     const currentMessage = document.getElementById("message-input").value.trim(); // Get the message
-    const selectedModel = document.getElementById("model-select").value;
+
+    let selectedModel;
+    if (document.getElementById("model-select").value === "custom") {
+        selectedModel = document.getElementById("custom-model-input").value;
+    } else {
+        selectedModel = document.getElementById("model-select").value;
+    }
 
     if (!selectedKnowledgebase) {
         alert("Please select a knowledgebase.");
@@ -239,6 +252,7 @@ async function sendToBackend(userId, model, messageList) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder('utf-8');
         let done = false;
+        let completeResponse = '';
 
         while (!done) {
             const {value, done: readerDone} = await reader.read();
@@ -249,8 +263,10 @@ async function sendToBackend(userId, model, messageList) {
                 // Append each chunk to the chat container
                 chatContainer.innerHTML += chunk;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
+                completeResponse += chunk;
             }
         }
+        chatHistory.push({ role: 'assistant', content: completeResponse});
     }catch (error){
         chatContainer.innerHTML = 'Error: ' + error.message;
     }
