@@ -33,7 +33,7 @@ document.getElementById("login-form").addEventListener("submit", function (event
                 localStorage.setItem('api-key', data.api_key);
                 localStorage.setItem('base-url', data.base_url);
                 // localStorage.setItem('model-select', data.model);
-                window.location.href = "index.html"; // Redirect to database page
+                window.location.href = "chat"; // Redirect to database page
             } else {
                 // Login failed, ask if user wants to create a new username
                 const createUser = confirm("Invalid username! Would you like to create a new username?");
@@ -51,7 +51,7 @@ document.getElementById("login-form").addEventListener("submit", function (event
                             if (createResponse.code===200) {
                                 // New user created successfully, redirect to database page
                                 setCookie('user_id', createResponse.user_id, 7); // Store userid
-                                window.location.href = "index.html"; // Redirect to database page
+                                window.location.href = "chat"; // Redirect to database page
                             } else {}
                         })
                         .catch(error => {
