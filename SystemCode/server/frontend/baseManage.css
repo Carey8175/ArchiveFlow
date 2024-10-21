@@ -1,0 +1,177 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+h2 {
+    color: #333; /* Header color */
+}
+
+.header {
+    display: flex;
+    justify-content: flex-end; /* Align items to the right */
+    align-items: center; /* Center items vertically */
+    padding: 10px 20px; /* Padding around the header */
+    background-color: #f4f4f4; /* Background color */
+    border-bottom: 1px solid #ddd; /* Bottom border */
+    position: relative; /* For positioning child elements */
+}
+
+
+/* Username Display Styles */
+.username-container {
+    font-size: 18px; /* Font size for username */
+    color: #333; /* Text color */
+    margin-right: 10px;
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+}
+
+#user_name {
+    margin-right: 10px; /* Space between username and button */
+}
+
+#rename-container {
+    display: none;
+    align-items: center; /* Center vertically */
+    margin-right: 10px;
+}
+
+/* Button Styles */
+button {
+    padding: 8px 12px;
+    background-color: #357ab8;
+    color: white;
+    border: none;
+    border-radius: 4px; /* Rounded corners for buttons */
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition */
+    margin-left: 5px;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #4a90e2; /* Change color on hover */
+}
+
+aside {
+    width: 25%;
+    padding: 20px;
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+}
+
+main {
+    display: flex;
+}
+
+section {
+    flex: 1;
+    padding: 20px;
+}
+
+input {
+    margin-right: 5px; /* Space between input and buttons */
+    padding: 10px; /* Consistent padding */
+    margin-bottom: 10px; /* Bottom margin for spacing */
+    width: calc(100% - 22px); /* Full width */
+    border: 1px solid #ccc; /* Input border */
+    border-radius: 4px; /* Rounded corners for input fields */
+}
+
+#file-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#file-list button {
+    margin-left: 10px;
+    padding: 8px 12px;
+    background-color: #357ab8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#file-list button:hover {
+    background-color: #4a90e2;
+}
+
+.file-upload-container {
+    display: flex;                 /* Use Flexbox layout */
+    align-items: center;          /* Center vertically */
+    gap: 10px;                    /* Space between elements */
+    margin-bottom: 20px;          /* Bottom margin */
+    border: 1px solid #ddd;       /* Add border */
+    border-radius: 8px;           /* Rounded corners */
+    padding: 10px;                /* Padding around the container */
+    background-color: #f9f9f9;    /* Light background color */
+}
+
+.file-upload-container input[type="file"],
+.file-upload-container input[type="text"] {
+    padding: 8px;                 /* Padding for inputs */
+    border: 1px solid #ccc;       /* Border */
+    border-radius: 4px;           /* Rounded corners */
+    font-size: 14px;              /* Font size */
+    height: 40px;                 /* Increased height for better accessibility */
+}
+
+.file-upload-container button {
+    padding: 8px 15px;            /* Padding for buttons */
+    background-color: #357ab8;    /* Button background color */
+    color: white;                 /* Button text color */
+    border: none;                 /* No border */
+    border-radius: 4px;           /* Rounded corners */
+    cursor: pointer;              /* Pointer cursor */
+    font-size: 14px;              /* Font size */
+    height: 40px;                 /* Increased height for better accessibility */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.file-upload-container button:hover {
+    background-color: #4a90e2;    /* Change color on hover */
+}
+
+/* Progress bar container */
+#upload-progress,
+#url-upload-progress {
+    appearance: none; /* Remove default styles */
+    width: 100%; /* Progress bar width */
+    height: 20px; /* Progress bar height */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f3f3f3; /* Background color */
+    overflow: hidden; /* Hide overflow */
+    margin-top: 10px; /* Top margin */
+}
+
+/* Progress bar background */
+#upload-progress::-webkit-progress-bar,
+#url-upload-progress::-webkit-progress-bar {
+    background-color: #f3f3f3; /* Progress bar background color */
+    border-radius: 5px; /* Rounded corners */
+}
+
+#upload-progress::-webkit-progress-value,
+#url-upload-progress::-webkit-progress-value {
+    background-color: #4caf50; /* Progress bar fill color */
+    border-radius: 5px; /* Rounded corners */
+}
+
+#upload-progress::-moz-progress-bar,
+#url-upload-progress::-moz-progress-bar {
+    background-color: #4caf50; /* Firefox progress bar fill color */
+}
+
+/* When the progress bar is uploading */
+#upload-progress.uploading,
+#url-upload-progress.uploading {
+    background-color: #ff9800; /* Background color during upload */
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>User Login</h2>
+            <form id="login-form">
+                <div class="input-box">
+                    <label for="user_name">User Name:</label>
+                    <input type="text" id="user_name" name="user_name" required>
+                </div>
+                <div class="button-box">
+                    <button type="submit">Login</button>
+                </div>
+                <div id="message" class="message"></div>
+                <div id="errorMessage" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+    <script src="login.js"></script>
+</body>
+</html>

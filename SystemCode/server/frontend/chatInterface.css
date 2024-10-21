@@ -1,0 +1,199 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0; /* Background color retained */
+    margin: 0;
+    padding: 20px;
+}
+
+/* Basic styles for the knowledge base list */
+#knowledgebase-list {
+    list-style-type: none; /* Remove default list style */
+    padding: 0; /* Remove padding */
+}
+
+/* Styles for knowledge base items */
+#knowledgebase-list li {
+    padding: 10px; /* Padding for list items */
+    margin: 5px 0; /* Margin for top and bottom */
+    border: 1px solid #ccc; /* Border */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s, border-color 0.3s; /* Smooth transition */
+}
+
+/* Styles when mouse hovers over items */
+#knowledgebase-list li:hover {
+    background-color: #e0f7fa; /* Change background color on hover */
+    border-color: #00796b; /* Change border color on hover */
+}
+
+
+#chat-interface {
+    background-color: transparent; /* Make chat interface background transparent */
+    border-radius: 0; /* Remove border radius */
+    box-shadow: none; /* Remove shadow */
+    padding: 0; /* Remove padding */
+    max-width: 500px; /* Set max width if necessary */
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    height: 500px; /* Set fixed height for chat interface */
+}
+
+h2 {
+    text-align: left; /* Align title to the left */
+    margin-bottom: 20px;
+    padding-left: 10px; /* Add some left padding */
+}
+
+#message-list {
+    list-style-type: none;
+    flex-grow: 1;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: none; /* Remove border */
+}
+
+#message-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd; /* Retain bottom border for message items */
+}
+
+#message-list li:last-child {
+    border-bottom: none; /* Remove bottom border for last message */
+}
+
+#message-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+}
+
+#message-input {
+    flex-grow: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #357ab8;
+    color: #fff;
+    cursor: pointer;
+    margin-right: 5px; /* Add space between buttons */
+}
+
+button:hover {
+    background-color: #357ab8;
+}
+
+#send-button {
+    padding: 10px 15px;
+    margin-left: 10px;
+    background-color: #357ab8; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* Remove button border */
+    border-radius: 4px; /* Button rounded corners */
+    cursor: pointer;
+}
+
+#send-button:hover {
+    background-color: #357ab8; /* Button hover background color */
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.token-limit {
+    margin-top: 10px;
+}
+
+.enabled {
+    background-color: #357ab8; /* Color when enabled */
+    color: white; /* Text color when enabled */
+}
+
+.disabled {
+    background-color: grey; /* Color when disabled */
+    color: white; /* Text color when disabled */
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#multi-turn-button {
+    background-color: gray;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#multi-turn-button.active {
+    background-color: #357ab8;
+}
+
+#retrival-button {
+    background-color: gray;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#retrival-button.active {
+    background-color: #357ab8;
+}

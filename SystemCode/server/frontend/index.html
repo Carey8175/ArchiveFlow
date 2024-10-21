@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="baseManage.css"> <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="chatInterface.css">
+    <title>Knowledgebase Page</title>
+</head>
+<body>
+    <header class="header">
+    <div class="username-container">
+        <div id="rename-container">
+            <input type="text" id="new_username" placeholder="Enter new username" />
+            <button id="confirm-rename-button">Confirm</button>
+            <button id="cancel-rename-button">Cancel</button>
+        </div>
+        <span id="user_name"></span> <!-- Display current username -->
+        <button id="rename-button">Rename</button>
+        <button id="logout-button">Log Out</button>
+    </div>
+</header>
+    <main>
+        <aside>
+            <h2>Knowledgebase List</h2>
+            <div class="add-knowledgebase">
+                <input type="text" id="new-knowledgebase" placeholder="New Knowledgebase Name">
+                <button id="add-knowledgebase">Add Knowledgebase</button>
+            </div>
+            <!-- Sidebar context menu -->
+            <ul id="knowledgebase-list"></ul>
+            <div id="sidebar-context-menu" style="display:none; position:absolute; z-index:1000;">
+                <ul>
+                    <button id="manage-knowledgebase">Manage</button>
+                    <button id="delete-knowledgebase">Delete</button>
+                </ul>
+            </div>
+            <!-- Manage Knowledgebase actions -->
+            <div id="knowledgebase-actions" style="display:none;">
+                <input type="text" id="edit-knowledgebase-name" placeholder="New Knowledgebase Name" />
+                <button id="edit-knowledgebase">Save Changes</button>
+            </div>
+        </aside>
+
+        <section id="chat-interface">
+            <h2>Chat Interface</h2>
+            <ul id="chat-box"></ul>
+            <div id="message-box">
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button id="send-button">Send</button>
+            </div>
+            <div class="button-container">
+                <button id="multi-turn-button" title="Multi-turn conversation is disabled">Multi-Turn</button>
+                <div id="tooltip" class="tooltip"></div>
+                <button id="new-chat-button">New Conversation</button>
+                <button id="model-settings-button">Model Settings</button>
+                <button id="retrival-button" title="Retrival is disabled">Retrival</button>
+            </div>
+        </section>
+        <div id="model-settings-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Model Settings</h2>
+                <label for="api_key">API Key:</label>
+                <input type="text" id="api-key" placeholder="Enter API Key">
+                <label for="base_url">Base URL:</label>
+                <input type="text" id="base-url" placeholder="Enter Base URL">
+
+                <label for="model-select">Select Model:</label>
+                <div class="model-selection-container">
+                    <select id="model-select"></select>
+                    <input type="text" id="custom-model-input" placeholder="Enter custom model name" style="display:none;" />
+                </div>
+                <div class="token-limit">
+                    <label for="token-limit">Response Limit (tokens):</label>
+                    <input type="range" id="token-limit" min="1" max="1000" value="500">
+                    <span id="token-value">500</span>
+                </div>
+                <button id="confirm-button">Confirm</button>
+            </div>
+        </div>
+
+
+        <section id="database-management" style="display: none;">
+            <h2>Database Management</h2>
+            <div id="manage-actions">
+                <button id="go-back-button">Go back to Chat</button>
+                <button id="confirm-edit">Rename</button>
+            </div>
+            <h4>Upload Document</h4>
+            <div class="file-upload-container">
+                <input type="file" id="file" accept=".txt, .pdf, .docx, .md, .jpg, .jpeg, .png" />
+                <button id="upload-button">Upload</button>
+                <input type="text" id="url-input" placeholder="Enter URL" />
+                <button id="add-url-button">Add URL</button>
+                <progress id="upload-progress" value="0" max="100" style="width: 100%; display: none;"></progress>
+            </div>
+            <h2 style=" font-size: 18px; margin-bottom: 10px;">File Management</h2>
+            <div id="file-list"></div>
+            <div id="context-menu" style="display: none; position: absolute; background-color: white; border: 1px solid #ccc; padding: 10px;">
+                <button id="delete-file" style="display:none;">Delete</button>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="header.js"></script>
+    <script type="module" src="sidebar.js"></script>
+    <script type="module" src="baseManage.js"></script>
+    <script type="module" src="chatInterface.js"></script>
+
+</body>
+</html>
