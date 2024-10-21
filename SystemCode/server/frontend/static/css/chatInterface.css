@@ -9,6 +9,8 @@ body {
 #knowledgebase-list {
     list-style-type: none; /* Remove default list style */
     padding: 0; /* Remove padding */
+    height: 300px; /* Set fixed height for knowledge base list */
+    overflow-y: auto; /* Add scroll bar for overflow */
 }
 
 /* Styles for knowledge base items */
@@ -32,11 +34,14 @@ body {
     border-radius: 0; /* Remove border radius */
     box-shadow: none; /* Remove shadow */
     padding: 0; /* Remove padding */
-    max-width: 800px; /* Set max width if necessary */
+    max-width: 1050px; /* Set max width if necessary */
     margin: auto;
     display: flex;
     flex-direction: column;
-    height: 500px; /* Set fixed height for chat interface */
+    height: 500px; /* 设置高度 */
+    max-height: 500px; /* 设置最大高度 */
+    /*overflow-y: auto; !* 如果内容超出，显示纵向滚动条 *!*/
+
 }
 
 h2 {
@@ -49,6 +54,7 @@ h2 {
     list-style-type: none;
     flex-grow: 1;
     padding: 0;
+    height: 100%;
     max-height: 300px;
     overflow-y: auto;
     margin-bottom: 20px;
