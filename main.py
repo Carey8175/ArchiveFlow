@@ -1,6 +1,7 @@
 from SystemCode.server.backends.sanic_api import app
 from sanic import Sanic
 from sanic.response import file
+import multiprocessing
 
 
 fe_app = Sanic('Frontend')
@@ -18,7 +19,7 @@ async def manage(request):
 fe_app.static('/static', './SystemCode/server/frontend/static')
 
 
-if __name__ == '__main__':
+def run_be():
     app.run(
         host="0.0.0.0",
         port=18777,
@@ -26,12 +27,27 @@ if __name__ == '__main__':
         single_process=True
     )
 
+
+def run_fe():
     fe_app.run(
         host="0.0.0.0",
         port=18776,
         access_log=False,
         single_process=True
     )
+
+
+if __name__ == '__main__':
+    process1 = multiprocessing.Process(target=run_fe)
+    process2 = multiprocessing.Process(target=run_be)
+
+    process1.start()
+    process2.start()
+
+    process1.join()
+    process2.join()
+
+
 
 
 
