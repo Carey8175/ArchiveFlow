@@ -32,7 +32,7 @@ body {
     border-radius: 0; /* Remove border radius */
     box-shadow: none; /* Remove shadow */
     padding: 0; /* Remove padding */
-    max-width: 500px; /* Set max width if necessary */
+    max-width: 800px; /* Set max width if necessary */
     margin: auto;
     display: flex;
     flex-direction: column;
