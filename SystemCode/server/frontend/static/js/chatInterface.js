@@ -252,6 +252,7 @@ async function sendToBackend(userId, model, messageList) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder('utf-8');
         let done = false;
+        let completeResponse = '';
 
         while (!done) {
             const {value, done: readerDone} = await reader.read();
@@ -262,8 +263,10 @@ async function sendToBackend(userId, model, messageList) {
                 // Append each chunk to the chat container
                 chatContainer.innerHTML += chunk;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
+                completeResponse += chunk;
             }
         }
+        chatHistory.push({ role: 'assistant', content: completeResponse});
     }catch (error){
         chatContainer.innerHTML = 'Error: ' + error.message;
     }
