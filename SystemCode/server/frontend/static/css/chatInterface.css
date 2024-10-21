@@ -9,7 +9,7 @@ body {
 #knowledgebase-list {
     list-style-type: none; /* Remove default list style */
     padding: 0; /* Remove padding */
-    height: 300px; /* Set fixed height for knowledge base list */
+    height: 350px; /* Set fixed height for knowledge base list */
     overflow-y: auto; /* Add scroll bar for overflow */
 }
 
@@ -38,10 +38,9 @@ body {
     margin: auto;
     display: flex;
     flex-direction: column;
-    height: 500px; /* 设置高度 */
-    max-height: 500px; /* 设置最大高度 */
-    /*overflow-y: auto; !* 如果内容超出，显示纵向滚动条 *!*/
-
+    height: 600px; /* 设置高度 */
+    max-height: 600px; /* 设置最大高度 */
+    overflow-y: auto; /* 如果内容超出，显示纵向滚动条 */
 }
 
 h2 {
@@ -75,21 +74,39 @@ h2 {
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    border-top: 1px solid #ccc;
+    /*border-top: 1px solid #ccc;*/
+    /*background-color: #ccc;*/
+    position: fixed;
+    top: calc(50% + 225px);
+    left: 40%; /* 左侧对齐到页面中心 */
+    right:0;
+    /*transform: translateX(-30%);*/
+    max-width: 45%; /* 控制最大宽度，保持一定的边距 */
+    z-index: 1000; /* 提高层级，确保在其他内容上面 */
+    /*border: 1px solid #ccc; !* 边框样式 *!*/
+    border: none; /* 边框样式 */
+    border-radius: 10px; /* 圆角边框 */
 }
 
 #message-input {
     flex-grow: 1;
     padding: 10px;
     margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: none;
+    background-color: #f0f0f0;
+    /*border-radius: 4px;*/
 }
 
 .button-container {
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
+    position: fixed;
+    top: calc(50% + 225px); /* 设置距离页面中部向下偏移 300px */
+    left: 30%; /* 左侧对齐到页面中心 */
+    right:0;
+    max-width: 10%;
+    z-index: 1000; /* 提高层级，确保在其他内容上面 */
 }
 
 button {
@@ -106,13 +123,29 @@ button:hover {
     background-color: #357ab8;
 }
 
+#retrival_button {
+    background-color: transparent;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: fixed;
+    top: calc(50% + 225px); /* 设置距离页面中部向下偏移 300px */
+    left: 81%; /* 左侧对齐到页面中心 */
+    right:0;
+    transform: translateX(50%);
+    max-width: 5%; /* 控制最大宽度，保持一定的边距 */
+    z-index: 1000; /* 提高层级，确保在其他内容上面 */
+}
+
 #send-button {
     padding: 10px 15px;
     margin-left: 10px;
     background-color: #357ab8; /* Button background color */
     color: white; /* Button text color */
     border: none; /* Remove button border */
-    border-radius: 4px; /* Button rounded corners */
+    border-radius: 10px; /* Button rounded corners */
     cursor: pointer;
 }
 
