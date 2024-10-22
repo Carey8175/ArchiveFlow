@@ -81,12 +81,50 @@ input {
     border-radius: 4px; /* Rounded corners for input fields */
 }
 
+#file-list {
+    list-style: none; /* 去掉默认的列表样式 */
+    padding: 0; /* 去掉内边距 */
+    margin: 0; /* 去掉外边距 */
+    max-width: 100%;
+    border: 1px solid #ddd; /* 添加边框 */
+    border-radius: 8px; /* 圆角边框 */
+    overflow: hidden; /* 隐藏溢出部分 */
+    height: 300px;
+    overflow-y: auto;
+    background-color: #f9f9f9; /* 背景颜色 */
+}
+
 #file-list li {
     padding: 10px;
     border-bottom: 1px solid #ddd;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background-color 0.3s;
+}
+
+#file-list li:hover {
+    background-color: #f1f1f1; /* 鼠标悬停时的背景颜色 */
+}
+
+#file-list li:last-child {
+    border-bottom: none; /* 最后一个项不显示分隔线 */
+}
+
+.file-status {
+    font-weight: bold; /* 状态文本加粗 */
+}
+
+.file-status.normal {
+    color: #2196F3; /* 蓝色 */
+}
+
+.file-status.waiting {
+    color: #9E9E9E; /* 灰色 */
+}
+
+.file-status.error {
+    color: #F44336; /* 红色 */
 }
 
 #file-list button {
@@ -105,35 +143,58 @@ input {
 }
 
 .file-upload-container {
-    display: flex;                 /* Use Flexbox layout */
+    display: flex;
+    flex-direction: column;
     align-items: center;          /* Center vertically */
-    gap: 10px;                    /* Space between elements */
-    margin-bottom: 20px;          /* Bottom margin */
+    gap: 5px;
+    justify-content: space-between;
     border: 1px solid #ddd;       /* Add border */
     border-radius: 8px;           /* Rounded corners */
     padding: 10px;                /* Padding around the container */
     background-color: #f9f9f9;    /* Light background color */
+    width: 100%;
+    height: 40px;
+    margin: 0 auto;
+    transition: height 0.3s ease;
+}
+
+.file-upload-row {
+    display: flex;                   /* 按钮和输入框在同一行 */
+    align-items: center;            /* 垂直居中对齐 */
+    gap: 5px;
+    width: 100%;
+}
+
+.file-upload-container.show-progress {
+    height: 60px;
+    padding-bottom: 20px;
 }
 
 .file-upload-container input[type="file"],
 .file-upload-container input[type="text"] {
-    padding: 8px;                 /* Padding for inputs */
+    padding: 0 6px;                 /* Padding for inputs */
     border: 1px solid #ccc;       /* Border */
     border-radius: 4px;           /* Rounded corners */
     font-size: 14px;              /* Font size */
-    height: 40px;                 /* Increased height for better accessibility */
+    height: 30px;                 /* Increased height for better accessibility */
+    line-height: 30px;
+    width: calc(60% - 12px);
 }
 
 .file-upload-container button {
-    padding: 8px 15px;            /* Padding for buttons */
+    padding: 0 12px;            /* Padding for buttons */
     background-color: #357ab8;    /* Button background color */
     color: white;                 /* Button text color */
     border: none;                 /* No border */
     border-radius: 4px;           /* Rounded corners */
     cursor: pointer;              /* Pointer cursor */
     font-size: 14px;              /* Font size */
-    height: 40px;                 /* Increased height for better accessibility */
+    height: 35px;                 /* Increased height for better accessibility */
+    line-height: 30px;
+    width: 170px;
     transition: background-color 0.3s; /* Smooth transition */
+    align-items: center;
+    justify-content: center;
 }
 
 .file-upload-container button:hover {
@@ -141,37 +202,21 @@ input {
 }
 
 /* Progress bar container */
-#upload-progress,
-#url-upload-progress {
-    appearance: none; /* Remove default styles */
-    width: 100%; /* Progress bar width */
-    height: 20px; /* Progress bar height */
-    border-radius: 5px; /* Rounded corners */
-    background-color: #f3f3f3; /* Background color */
-    overflow: hidden; /* Hide overflow */
-    margin-top: 10px; /* Top margin */
+#upload-progress {
+    width: 100%;
+    height: 8px;
+    display: none;
+    border-radius: 4px;
+    background-color: #f3f3f3;
+    margin-top: 10px;
 }
 
-/* Progress bar background */
-#upload-progress::-webkit-progress-bar,
-#url-upload-progress::-webkit-progress-bar {
-    background-color: #f3f3f3; /* Progress bar background color */
-    border-radius: 5px; /* Rounded corners */
+#upload-progress::-webkit-progress-value {
+    background-color: #4caf50;
+    border-radius: 4px;
 }
 
-#upload-progress::-webkit-progress-value,
-#url-upload-progress::-webkit-progress-value {
-    background-color: #4caf50; /* Progress bar fill color */
-    border-radius: 5px; /* Rounded corners */
-}
-
-#upload-progress::-moz-progress-bar,
-#url-upload-progress::-moz-progress-bar {
-    background-color: #4caf50; /* Firefox progress bar fill color */
-}
-
-/* When the progress bar is uploading */
-#upload-progress.uploading,
-#url-upload-progress.uploading {
-    background-color: #ff9800; /* Background color during upload */
+#upload-progress::-moz-progress-bar {
+    background-color: #4caf50;
+    border-radius: 4px;
 }
