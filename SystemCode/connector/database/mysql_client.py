@@ -60,6 +60,7 @@ class MySQLClient:
             # 如果数据库不存在，则新建数据库
             cursor.execute('CREATE DATABASE IF NOT EXISTS {}'.format(self.database))
             logging.debug("数据库{}新建成功或已存在".format(self.database))
+            self.create_tables_()
         logging.info("[SUCCESS] 数据库{}检查通过".format(self.database))
 
         cursor.close()
