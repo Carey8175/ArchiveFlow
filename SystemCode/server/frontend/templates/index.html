@@ -46,16 +46,14 @@
             <h2>Chat Interface</h2>
             <ul id="chat-box"></ul>
             <div id="message-box">
+                <div class="button-container">
+                    <button id="multi-turn-button" title="Multi-turn conversation is disabled">M</button>
+                    <div id="tooltip" class="tooltip"></div>
+                    <button id="new-chat-button" title="Start a new chat">NC</button>
+                    <button id="model-settings-button" title="Set your model">Mdl</button>
+                </div>
                 <input type="text" id="message-input" placeholder="Type your message...">
                 <button id="send-button">Send</button>
-            </div>
-            <div class="button-container">
-                <button id="multi-turn-button" title="Multi-turn conversation is disabled">M</button>
-                <div id="tooltip" class="tooltip"></div>
-                <button id="new-chat-button">NC</button>
-                <button id="model-settings-button">Mdl</button>
-            </div>
-            <div id="retrival_button">
                 <button id="retrival-button" title="Retrival is disabled">Retrival</button>
             </div>
         </section>
@@ -91,11 +89,13 @@
             </div>
             <h4>Upload Document</h4>
             <div class="file-upload-container">
-                <input type="file" id="file" accept=".txt, .pdf, .docx, .md, .jpg, .jpeg, .png" />
-                <button id="upload-button">Upload</button>
-                <input type="text" id="url-input" placeholder="Enter URL" />
-                <button id="add-url-button">Add URL</button>
-                <progress id="upload-progress" value="0" max="100" style="width: 100%; display: none;"></progress>
+                <div class="file-upload-row">
+                    <input type="file" id="file" accept=".txt, .pdf, .docx, .md, .jpg, .jpeg, .png" />
+                    <button id="upload-button">Upload</button>
+                    <input type="text" id="url-input" placeholder="Enter URL" />
+                    <button id="add-url-button">Add URL</button>
+                </div>
+                <progress id="upload-progress" value="0" max="100"></progress>
             </div>
             <h2 style=" font-size: 18px; margin-bottom: 10px;">File Management</h2>
             <div id="file-list"></div>

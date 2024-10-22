@@ -42,6 +42,34 @@ body {
     max-height: 600px; /* 设置最大高度 */
     overflow-y: auto; /* 如果内容超出，显示纵向滚动条 */
 }
+.message {
+    padding: 10px; /* 内边距 */
+    margin: 5px; /* 上下间距 */
+    border-radius: 10px; /* 圆角 */
+    word-wrap: break-word; /* 自动换行 */
+    display: inline-block; /* 自适应宽度 */
+    max-width: 80%; /* 最大宽度 */
+    min-width: 50px; /* 最小宽度 */
+    overflow: hidden; /* 超出内容隐藏 */
+}
+.assistant {
+background-color: #e9ecef;
+float: left;
+clear: both;
+}
+.user {
+background-color: #007bff;
+color: white;
+float: right;
+clear: both;
+}
+
+/* 清除浮动 */
+#chat-box::after {
+content: "";
+clear: both;
+display: table;
+}
 
 h2 {
     text-align: left; /* Align title to the left */
@@ -71,42 +99,43 @@ h2 {
 
 #message-box {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     padding: 10px;
-    /*border-top: 1px solid #ccc;*/
-    /*background-color: #ccc;*/
     position: fixed;
-    top: calc(50% + 225px);
-    left: 40%; /* 左侧对齐到页面中心 */
-    right:0;
-    /*transform: translateX(-30%);*/
-    max-width: 45%; /* 控制最大宽度，保持一定的边距 */
-    z-index: 1000; /* 提高层级，确保在其他内容上面 */
+    top: calc(50% + 240px);
+    left: 39%;
+    right: 0;
+    width: 45%;
+    z-index: 1000; /* 提高层级*/
     /*border: 1px solid #ccc; !* 边框样式 *!*/
     border: none; /* 边框样式 */
-    border-radius: 10px; /* 圆角边框 */
+    height: 15px;
 }
 
 #message-input {
     flex-grow: 1;
     padding: 10px;
     margin-right: 10px;
-    border: none;
+    border: 1px solid #ccc; /* 边框样式 */
+    height: 14px;
     background-color: #f0f0f0;
-    /*border-radius: 4px;*/
+    border-radius: 4px;
 }
 
 .button-container {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    /*margin-top: 10px;*/
     position: fixed;
-    top: calc(50% + 225px); /* 设置距离页面中部向下偏移 300px */
-    left: 30%; /* 左侧对齐到页面中心 */
-    right:0;
-    max-width: 10%;
+    top: calc(50% + 240px);
+    left: 29%; /* 左侧对齐到页面中心 */
+    right: 0;
+    width: 8%;
     z-index: 1000; /* 提高层级，确保在其他内容上面 */
+    /*border: 1px solid #ccc; !* 边框样式 *!*/
+    border: none; /* 边框样式 */
+    /*height: 14px;*/
 }
 
 button {
@@ -117,35 +146,38 @@ button {
     color: #fff;
     cursor: pointer;
     margin-right: 5px; /* Add space between buttons */
+    /*height: 14px;*/
 }
 
 button:hover {
     background-color: #357ab8;
 }
 
-#retrival_button {
-    background-color: transparent;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    position: fixed;
-    top: calc(50% + 225px); /* 设置距离页面中部向下偏移 300px */
-    left: 81%; /* 左侧对齐到页面中心 */
-    right:0;
-    transform: translateX(50%);
-    max-width: 5%; /* 控制最大宽度，保持一定的边距 */
-    z-index: 1000; /* 提高层级，确保在其他内容上面 */
-}
+/*#retrival_button {*/
+/*    background-color: transparent;*/
+/*    color: white;*/
+/*    border: none;*/
+/*    padding: 10px 20px;*/
+/*    cursor: pointer;*/
+/*    transition: background-color 0.3s;*/
+/*    position: fixed;*/
+/*    top: calc(50% + 230px);*/
+/*    left: 80%;*/
+/*    right:0;*/
+/*    transform: translateX(50%);*/
+/*    max-width: 5%; !* 控制最大宽度，保持一定的边距 *!*/
+/*    height: 15px;*/
+/*    z-index: 1000; !* 提高层级，确保在其他内容上面 *!*/
+/*}*/
 
 #send-button {
     padding: 10px 15px;
-    margin-left: 10px;
+    margin-left: 5px;
     background-color: #357ab8; /* Button background color */
     color: white; /* Button text color */
     border: none; /* Remove button border */
-    border-radius: 10px; /* Button rounded corners */
+    border-radius: 4px; /* Button rounded corners */
+    height: 36px;
     cursor: pointer;
 }
 
@@ -215,7 +247,7 @@ button:hover {
     background-color: gray;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 12px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
@@ -228,9 +260,16 @@ button:hover {
     background-color: gray;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 10px;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-left: 5px;
+    /*left: 80%;*/
+    /*right:0;*/
+    /*transform: translateX(50%);*/
+    max-width: 15%; /* 控制最大宽度，保持一定的边距 */
+    height: 36px;
+    z-index: 1000; /* 提高层级，确保在其他内容上面 */
 }
 
 #retrival-button.active {

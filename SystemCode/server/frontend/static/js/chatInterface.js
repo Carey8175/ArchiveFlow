@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // loadStoredData();
 
     // Check if model is selected
-    if (!selectedModel) {
+    if (!modelSelect) {
         alert("Please select a model before starting the chat.");
     }
 
@@ -160,6 +160,7 @@ function sendMessage() {
     let retrivalMessages = [];
 
     sendButton.disabled = true;
+    addMessageToChat('user', currentMessage);
     // Check if retrieval is enabled
     if (isRetrivalEnabled) {
         // Send the query to the retrieval URL
@@ -220,12 +221,12 @@ function handleSendMessage(userId, selectedModel, retrivalMessages, currentMessa
     if (isMultiTurnEnabled) {
         chatHistory.push({ role: 'user', content: currentMessage });
         messagesToSend.push(...chatHistory);
-        addMessageToChat('user', currentMessage);
+        // addMessageToChat('user', currentMessage);
         sendToBackend(userId, selectedModel, messagesToSend);
     } else {
         // Single-turn mode: Send only the current message immediately
         messagesToSend.push({ role: 'user', content: currentMessage });
-        addMessageToChat('user', currentMessage);
+        // addMessageToChat('user', currentMessage);
         sendToBackend(userId, selectedModel, messagesToSend);
     }
     document.getElementById("message-input").value = '';
@@ -255,6 +256,12 @@ async function sendToBackend(userId, model, messageList) {
         const decoder = new TextDecoder('utf-8');
         let done = false;
         let completeResponse = '';
+        // add new div element to chat box
+        const assistantAnswer = document.createElement('li');
+        assistantAnswer.className = 'message assistant';
+        chatContainer.appendChild(assistantAnswer);
+        // chatContainer.appendChild(document.createElement('div'))
+        let receivedResponse = ''
 
         while (!done) {
             const {value, done: readerDone} = await reader.read();
@@ -263,8 +270,10 @@ async function sendToBackend(userId, model, messageList) {
             if (value) {
                 const chunk = decoder.decode(value, {stream: true});
                 // Append each chunk to the chat container
-                chatContainer.innerHTML += chunk;
+                receivedResponse += chunk
+                assistantAnswer.innerHTML = receivedResponse;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
+                assistantAnswer.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 completeResponse += chunk;
             }
         }
@@ -277,10 +286,12 @@ async function sendToBackend(userId, model, messageList) {
 // Function to display messages in the chat box
 function addMessageToChat(role, message) {
     const chatBox = document.getElementById("chat-box");
-    const newMessage = document.createElement("div");
+    const newMessage = document.createElement("li");
+    newMessage.classList.add('message');
     newMessage.classList.add(role);  // Add class based on role (e.g., 'user' or 'assistant')
     newMessage.textContent = message;
     chatBox.appendChild(newMessage);  // Append the new message to chat display
+    // chatBox.appendChild(document.createElement('div'));
 }
 
 function modelChoices() {

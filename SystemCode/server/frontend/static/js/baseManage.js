@@ -15,10 +15,11 @@ const sidebarMenu = document.getElementById("sidebar-context-menu");
 
 const fileList = document.getElementById("file-list");
 const fileInput = document.getElementById("file");
+const uploadButton = document.getElementById("upload-button");
 const allowedExtensions = ['.txt', '.pdf', '.docx', '.md', '.jpg', '.jpeg', '.png'];
 const urlInput = document.getElementById('url-input');
+const addButton = document.getElementById("add-url-button");
 const uploadProgress = document.getElementById('upload-progress');
-const contextMenu = document.getElementById("context-menu");
 
 export function manageKnowledgebase(selectedKnowledgebase) {
     databaseManagement.style.display = "block";
@@ -27,26 +28,16 @@ export function manageKnowledgebase(selectedKnowledgebase) {
         editKnowledgebase(selectedKnowledgebase);
     };
 
+    uploadButton.disabled = false;
     document.getElementById("upload-button").onclick = function() {
-        const uploadButton = document.getElementById("upload-button");
         uploadButton.disabled = true;
-        uploadFile(selectedKnowledgebase).then(() => {
-            uploadButton.disabled = false;
-        }).catch((error) => {
-            console.error("Error during file upload:", error);
-            uploadButton.disabled = false;
-        });
+        uploadFile(selectedKnowledgebase);
     };
 
+    addButton.disabled = false;
     document.getElementById("add-url-button").onclick = function() {
-        const addButton = document.getElementById("add-url-button");
-
-        addUrl(selectedKnowledgebase).then(() => {
-            addButton.disabled = false;
-        }).catch((error) => {
-            console.error("Error during file upload:", error);
-            addButton.disabled = false;
-        });
+        addButton.disabled = false;
+        addUrl(selectedKnowledgebase)
     };
 
     loadFileList();
@@ -134,7 +125,19 @@ function loadFileList(e) {
         .then(response => response.json())
         .then((data) => {
             // Clear current file list
-            fileList.innerHTML = "";
+            fileList.innerHTML = "    <table id=\"file-table\">\n" +
+            "        <thead>\n" +
+            "            <tr>\n" +
+            "                <th>File name</th>\n" +
+            "                <th>Date</th>\n" +
+            "                <th>Size</th>\n" +
+            "                <th>Status</th>\n" +
+            "            </tr>\n" +
+            "        </thead>\n" +
+            "        <tbody>\n" +
+            "            <!-- 文件信息将通过 JavaScript 添加到这里 -->\n" +
+            "        </tbody>";
+            const fileTableBody = document.querySelector("#file-table tbody")
 
             // Iterate over returned files and append to the list
             data.data.forEach(file => {
@@ -146,7 +149,7 @@ function loadFileList(e) {
                     timestamp.substring(8, 10),
                     timestamp.substring(10, 12)
                 );
-                const formattedDate = fileDate.toISOString().replace("T", " ").substring(0, 16);
+                const formattedDate = fileDate.toLocaleString().replace("T", " ").replace(",", " ").substring(0, 16);
 
                 let formattedFileSize;
                 if (file_size < 1024) {
@@ -158,11 +161,49 @@ function loadFileList(e) {
                 }
 
                 let currentFileId = null;
-                const listItem = document.createElement("li");
-                const contextMenu = document.getElementById("context-menu");
-                listItem.textContent = `${file_name}, ${formattedDate}, ${formattedFileSize}, ${status}`;
 
-                listItem.addEventListener("contextmenu", function (e) {
+                const tableRow = document.createElement("tr");
+
+                const fileNamesCell = document.createElement("td");
+                fileNamesCell.classList.add('file-name');
+                fileNamesCell.textContent = file_name;
+                fileNamesCell.title = file_name;
+
+                const fileDatesCell = document.createElement("td");
+                fileDatesCell.textContent = formattedDate;
+
+                const fileSizesCell = document.createElement("td");
+                fileSizesCell.textContent = formattedFileSize;
+
+                const fileStatusCell = document.createElement("td");
+                fileStatusCell.classList.add('file-status');
+
+                switch (status.toLowerCase()) {
+                    case "normal":
+                        fileStatusCell.classList.add("normal");
+                        break;
+                    case "waiting":
+                        fileStatusCell.classList.add("waiting");
+                        break;
+                    case "error":
+                        fileStatusCell.classList.add("error");
+                        break;
+                    default:
+                        fileStatusCell.style.color = "#000";
+                        break;
+                }
+
+                fileStatusCell.textContent = status;
+
+                tableRow.appendChild(fileNamesCell);
+                tableRow.appendChild(fileDatesCell);
+                tableRow.appendChild(fileSizesCell);
+                tableRow.appendChild(fileStatusCell);
+                fileTableBody.appendChild(tableRow);
+
+                const contextMenu = document.getElementById("context-menu");
+
+                tableRow.addEventListener("contextmenu", function (e) {
                     e.preventDefault();
                     currentFileId = file_id;
 
@@ -187,7 +228,7 @@ function loadFileList(e) {
                 });
 
                 // Append file details to the list item
-                fileList.appendChild(listItem);
+                // fileList.appendChild(listItem);
             });
         })
         .catch(error => {
@@ -241,6 +282,8 @@ function uploadFile() {
 
     uploadProgress.style.display = 'block';
     uploadProgress.value = 0;
+    document.querySelector('.file-upload-container').classList.add('show-progress');
+
 
     const xhr = new XMLHttpRequest();
 
@@ -273,6 +316,7 @@ function uploadFile() {
         uploadProgress.style.display = 'none';
     };
     xhr.send(formData);
+    uploadButton.disabled = false;
 }
 
 function addUrl() {
