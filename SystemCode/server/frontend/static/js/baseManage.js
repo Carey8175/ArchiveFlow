@@ -125,7 +125,19 @@ function loadFileList(e) {
         .then(response => response.json())
         .then((data) => {
             // Clear current file list
-            fileList.innerHTML = "";
+            fileList.innerHTML = "    <table id=\"file-table\">\n" +
+            "        <thead>\n" +
+            "            <tr>\n" +
+            "                <th>File name</th>\n" +
+            "                <th>Date</th>\n" +
+            "                <th>Size</th>\n" +
+            "                <th>Status</th>\n" +
+            "            </tr>\n" +
+            "        </thead>\n" +
+            "        <tbody>\n" +
+            "            <!-- 文件信息将通过 JavaScript 添加到这里 -->\n" +
+            "        </tbody>";
+            const fileTableBody = document.querySelector("#file-table tbody")
 
             // Iterate over returned files and append to the list
             data.data.forEach(file => {
@@ -137,7 +149,7 @@ function loadFileList(e) {
                     timestamp.substring(8, 10),
                     timestamp.substring(10, 12)
                 );
-                const formattedDate = fileDate.toLocaleString().replace("T", " ").replace(",", " ").substring(0, 17);
+                const formattedDate = fileDate.toLocaleString().replace("T", " ").replace(",", " ").substring(0, 16);
 
                 let formattedFileSize;
                 if (file_size < 1024) {
@@ -150,47 +162,48 @@ function loadFileList(e) {
 
                 let currentFileId = null;
 
-                const listItem = document.createElement("li");
+                const tableRow = document.createElement("tr");
 
-                const fileNames = document.createElement("span");
-                fileNames.classList.add("file-names");
-                fileNames.textContent = file_name;
+                const fileNamesCell = document.createElement("td");
+                fileNamesCell.classList.add('file-name');
+                fileNamesCell.textContent = file_name;
+                fileNamesCell.title = file_name;
 
-                const fileDates = document.createElement("span");
-                fileDates.classList.add("file-dates");
-                fileDates.textContent = formattedDate;
+                const fileDatesCell = document.createElement("td");
+                fileDatesCell.textContent = formattedDate;
 
-                const fileSizes = document.createElement("span");
-                fileSizes.classList.add("file-details");
-                fileSizes.textContent = formattedFileSize;
+                const fileSizesCell = document.createElement("td");
+                fileSizesCell.textContent = formattedFileSize;
 
-                const fileStatus = document.createElement("span");
-                fileStatus.classList.add("file-status");
+                const fileStatusCell = document.createElement("td");
+                fileStatusCell.classList.add('file-status');
 
                 switch (status.toLowerCase()) {
                     case "normal":
-                        fileStatus.classList.add("normal");
+                        fileStatusCell.classList.add("normal");
                         break;
                     case "waiting":
-                        fileStatus.classList.add("waiting");
+                        fileStatusCell.classList.add("waiting");
                         break;
                     case "error":
-                        fileStatus.classList.add("error");
+                        fileStatusCell.classList.add("error");
                         break;
                     default:
-                        fileStatus.style.color = "#000";
+                        fileStatusCell.style.color = "#000";
                         break;
                 }
 
-                fileStatus.textContent = status;
+                fileStatusCell.textContent = status;
+
+                tableRow.appendChild(fileNamesCell);
+                tableRow.appendChild(fileDatesCell);
+                tableRow.appendChild(fileSizesCell);
+                tableRow.appendChild(fileStatusCell);
+                fileTableBody.appendChild(tableRow);
 
                 const contextMenu = document.getElementById("context-menu");
-                listItem.appendChild(fileNames);
-                listItem.appendChild(fileDates);
-                listItem.appendChild(fileSizes);
-                listItem.appendChild(fileStatus);
 
-                listItem.addEventListener("contextmenu", function (e) {
+                tableRow.addEventListener("contextmenu", function (e) {
                     e.preventDefault();
                     currentFileId = file_id;
 
@@ -215,7 +228,7 @@ function loadFileList(e) {
                 });
 
                 // Append file details to the list item
-                fileList.appendChild(listItem);
+                // fileList.appendChild(listItem);
             });
         })
         .catch(error => {
