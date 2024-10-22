@@ -220,3 +220,8 @@ input {
     background-color: #4caf50;
     border-radius: 4px;
 }
+
+.selected {
+    background-color: #e0f7fa; /* Change background color on hover */
+    border-color: #00796b; /* Change border color on hover */
+}
