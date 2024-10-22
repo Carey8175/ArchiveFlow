@@ -81,21 +81,11 @@ input {
     border-radius: 4px; /* Rounded corners for input fields */
 }
 
-/*#file-list {*/
-/*    list-style: none; !* 去掉默认的列表样式 *!*/
-/*    padding: 0; !* 去掉内边距 *!*/
-/*    margin: 0; !* 去掉外边距 *!*/
-/*    max-width: 100%;*/
-/*    border: 1px solid #ddd; !* 添加边框 *!*/
-/*    border-radius: 8px; !* 圆角边框 *!*/
-/*    overflow: hidden; !* 隐藏溢出部分 *!*/
-/*    height: 300px;*/
-/*    overflow-y: auto;*/
-/*    background-color: #f9f9f9; !* 背景颜色 *!*/
-/*}*/
 #file-list {
+    max-height: 400px; /* 设置表格容器的最大高度 */
     margin: 0; /* 去掉外边距 */
     padding: 0; /* 去掉内边距 */
+    overflow-y: auto; /* 垂直滚动条 */
 }
 
 #file-list li {
@@ -268,7 +258,50 @@ tr:hover {
 #context-menu {
     display: none;
     position: absolute;
-    background-color: transparent; /* 80%透明 */
+    background-color: transparent;
     border: none;
     padding: 10px;
+}
+
+#sidebar-context-menu {
+    display: none; /* 默认隐藏 */
+    position: absolute;
+    background-color: white; /* 白色背景 */
+    border: 1px solid #ccc; /* 边框 */
+    width: 80px;
+    border-radius: 8px; /* 圆角 */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+    padding: 10px; /* 内边距 */
+    z-index: 1000; /* 确保菜单在最前面 */
+}
+
+#sidebar-context-menu ul {
+    list-style: none; /* 去除列表默认样式 */
+    padding: 0; /* 无内边距 */
+    margin: 0; /* 无外边距 */
+}
+
+#sidebar-context-menu li {
+    margin-bottom: 5px; /* 按钮间距 */
+}
+
+#sidebar-context-menu li:last-child {
+    margin-bottom: 0; /* 最后一个项无间距 */
+}
+
+#sidebar-context-menu button {
+    display: block; /* 按钮独占一行 */
+    width: 98%;
+    padding: 4px; /* 按钮内边距 */
+    background-color: #357ab8; /* 按钮背景色 */
+    border: none; /* 去掉默认边框 */
+    border-radius: 4px; /* 圆角按钮 */
+    text-align: center;
+    cursor: pointer; /* 鼠标手形光标 */
+    font-size: 15px; /* 文字大小 */
+    margin: 0 auto;
+}
+
+#sidebar-context-menu button:hover {
+    background-color: #69a6ef; /* 鼠标悬停时的背景色 */
 }
