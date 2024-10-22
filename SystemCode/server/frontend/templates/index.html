@@ -46,14 +46,14 @@
             <h2>Chat Interface</h2>
             <ul id="chat-box"></ul>
             <div id="message-box">
+                <div class="button-container">
+                    <button id="multi-turn-button" title="Multi-turn conversation is disabled">M</button>
+                    <div id="tooltip" class="tooltip"></div>
+                    <button id="new-chat-button" title="Start a new chat">NC</button>
+                    <button id="model-settings-button" title="Set your model">Mdl</button>
+                </div>
                 <input type="text" id="message-input" placeholder="Type your message...">
                 <button id="send-button">Send</button>
-            </div>
-            <div class="button-container">
-                <button id="multi-turn-button" title="Multi-turn conversation is disabled">Multi-Turn</button>
-                <div id="tooltip" class="tooltip"></div>
-                <button id="new-chat-button">New Conversation</button>
-                <button id="model-settings-button">Model Settings</button>
                 <button id="retrival-button" title="Retrival is disabled">Retrival</button>
             </div>
         </section>

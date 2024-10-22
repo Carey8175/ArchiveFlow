@@ -75,7 +75,7 @@ section {
 input {
     margin-right: 5px; /* Space between input and buttons */
     padding: 10px; /* Consistent padding */
-    margin-bottom: 10px; /* Bottom margin for spacing */
+    /*margin-bottom: 10px; !* Bottom margin for spacing *!*/
     width: calc(100% - 22px); /* Full width */
     border: 1px solid #ccc; /* Input border */
     border-radius: 4px; /* Rounded corners for input fields */
