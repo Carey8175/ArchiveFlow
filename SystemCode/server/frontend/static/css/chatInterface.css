@@ -42,6 +42,34 @@ body {
     max-height: 600px; /* 设置最大高度 */
     overflow-y: auto; /* 如果内容超出，显示纵向滚动条 */
 }
+.message {
+    padding: 10px; /* 内边距 */
+    margin: 5px; /* 上下间距 */
+    border-radius: 10px; /* 圆角 */
+    word-wrap: break-word; /* 自动换行 */
+    display: inline-block; /* 自适应宽度 */
+    max-width: 80%; /* 最大宽度 */
+    min-width: 50px; /* 最小宽度 */
+    overflow: hidden; /* 超出内容隐藏 */
+}
+.assistant {
+background-color: #e9ecef;
+float: left;
+clear: both;
+}
+.user {
+background-color: #007bff;
+color: white;
+float: right;
+clear: both;
+}
+
+/* 清除浮动 */
+#chat-box::after {
+content: "";
+clear: both;
+display: table;
+}
 
 h2 {
     text-align: left; /* Align title to the left */
