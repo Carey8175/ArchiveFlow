@@ -29,12 +29,13 @@
             </div>
             <!-- Sidebar context menu -->
             <ul id="knowledgebase-list"></ul>
-            <div id="sidebar-context-menu" style="display:none; position:absolute; z-index:1000;">
+            <div id="sidebar-context-menu">
                 <ul>
-                    <button id="manage-knowledgebase">Manage</button>
-                    <button id="delete-knowledgebase">Delete</button>
+                    <li><button id="manage-knowledgebase">Manage</button></li>
+                    <li><button id="delete-knowledgebase">Delete</button></li>
                 </ul>
             </div>
+
             <!-- Manage Knowledgebase actions -->
             <div id="knowledgebase-actions" style="display:none;">
                 <input type="text" id="edit-knowledgebase-name" placeholder="New Knowledgebase Name" />
@@ -99,7 +100,7 @@
             </div>
             <h2 style=" font-size: 18px; margin-bottom: 10px;">File Management</h2>
             <div id="file-list"></div>
-            <div id="context-menu" style="display: none; position: absolute; background-color: white; border: 1px solid #ccc; padding: 10px;">
+            <div id="context-menu" style="display: none; position: absolute; background-color: transparent; border: none; padding: 10px;">
                 <button id="delete-file" style="display:none;">Delete</button>
             </div>
         </section>

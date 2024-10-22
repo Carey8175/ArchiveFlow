@@ -153,23 +153,6 @@ button:hover {
     background-color: #357ab8;
 }
 
-/*#retrival_button {*/
-/*    background-color: transparent;*/
-/*    color: white;*/
-/*    border: none;*/
-/*    padding: 10px 20px;*/
-/*    cursor: pointer;*/
-/*    transition: background-color 0.3s;*/
-/*    position: fixed;*/
-/*    top: calc(50% + 230px);*/
-/*    left: 80%;*/
-/*    right:0;*/
-/*    transform: translateX(50%);*/
-/*    max-width: 5%; !* 控制最大宽度，保持一定的边距 *!*/
-/*    height: 15px;*/
-/*    z-index: 1000; !* 提高层级，确保在其他内容上面 *!*/
-/*}*/
-
 #send-button {
     padding: 10px 15px;
     margin-left: 5px;
