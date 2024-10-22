@@ -118,7 +118,6 @@ knowledgebaseList.addEventListener("contextmenu", function (event) {
     }
     selectedItem.classList.add('selected');
 
-
     if (!kb_id || !kb_name) return;
 
     selectedKnowledgebase = { kb_id, kb_name };
