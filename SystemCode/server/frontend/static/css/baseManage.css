@@ -94,8 +94,10 @@ input {
 /*    background-color: #f9f9f9; !* 背景颜色 *!*/
 /*}*/
 #file-list {
+    max-height: 400px; /* 设置表格容器的最大高度 */
     margin: 0; /* 去掉外边距 */
     padding: 0; /* 去掉内边距 */
+    overflow-y: auto; /* 垂直滚动条 */
 }
 
 #file-list li {
