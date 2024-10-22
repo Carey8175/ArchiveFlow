@@ -85,7 +85,21 @@ knowledgebaseList.addEventListener("click", function (event) {
 
     if (!kb_id || !kb_name) return;
 
+    const previousSelected = knowledgebaseList.querySelector('.selected');
+    if (previousSelected) {
+        previousSelected.classList.remove('selected');
+        previousSelected.style.backgroundColor = "";
+        previousSelected.style.color = "";
+    }
+    selectedItem.classList.add('selected');
+
+
     selectedKnowledgebase = { kb_id, kb_name };
+    // selectedItem.classList.add('selected');
+    // selectedItem.style.backgroundColor = "blue"; // 或使用 CSS 样式设置
+    // selectedItem.style.color = "white";
+
+
 
     // Enter chat interface for selected knowledgebase
     goToChatInterface(selectedKnowledgebase);
