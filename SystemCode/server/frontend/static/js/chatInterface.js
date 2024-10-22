@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // loadStoredData();
 
     // Check if model is selected
-    if (!selectedModel) {
+    if (!modelSelect) {
         alert("Please select a model before starting the chat.");
     }
 

@@ -15,10 +15,11 @@ const sidebarMenu = document.getElementById("sidebar-context-menu");
 
 const fileList = document.getElementById("file-list");
 const fileInput = document.getElementById("file");
+const uploadButton = document.getElementById("upload-button");
 const allowedExtensions = ['.txt', '.pdf', '.docx', '.md', '.jpg', '.jpeg', '.png'];
 const urlInput = document.getElementById('url-input');
+const addButton = document.getElementById("add-url-button");
 const uploadProgress = document.getElementById('upload-progress');
-const contextMenu = document.getElementById("context-menu");
 
 export function manageKnowledgebase(selectedKnowledgebase) {
     databaseManagement.style.display = "block";
@@ -27,26 +28,16 @@ export function manageKnowledgebase(selectedKnowledgebase) {
         editKnowledgebase(selectedKnowledgebase);
     };
 
+    uploadButton.disabled = false;
     document.getElementById("upload-button").onclick = function() {
-        const uploadButton = document.getElementById("upload-button");
         uploadButton.disabled = true;
-        uploadFile(selectedKnowledgebase).then(() => {
-            uploadButton.disabled = false;
-        }).catch((error) => {
-            console.error("Error during file upload:", error);
-            uploadButton.disabled = false;
-        });
+        uploadFile(selectedKnowledgebase);
     };
 
+    addButton.disabled = false;
     document.getElementById("add-url-button").onclick = function() {
-        const addButton = document.getElementById("add-url-button");
-
-        addUrl(selectedKnowledgebase).then(() => {
-            addButton.disabled = false;
-        }).catch((error) => {
-            console.error("Error during file upload:", error);
-            addButton.disabled = false;
-        });
+        addButton.disabled = false;
+        addUrl(selectedKnowledgebase)
     };
 
     loadFileList();
@@ -146,7 +137,7 @@ function loadFileList(e) {
                     timestamp.substring(8, 10),
                     timestamp.substring(10, 12)
                 );
-                const formattedDate = fileDate.toISOString().replace("T", " ").substring(0, 16);
+                const formattedDate = fileDate.toLocaleString().replace("T", " ").replace(",", " ").substring(0, 17);
 
                 let formattedFileSize;
                 if (file_size < 1024) {
@@ -158,9 +149,46 @@ function loadFileList(e) {
                 }
 
                 let currentFileId = null;
+
                 const listItem = document.createElement("li");
+
+                const fileNames = document.createElement("span");
+                fileNames.classList.add("file-names");
+                fileNames.textContent = file_name;
+
+                const fileDates = document.createElement("span");
+                fileDates.classList.add("file-dates");
+                fileDates.textContent = formattedDate;
+
+                const fileSizes = document.createElement("span");
+                fileSizes.classList.add("file-details");
+                fileSizes.textContent = formattedFileSize;
+
+                const fileStatus = document.createElement("span");
+                fileStatus.classList.add("file-status");
+
+                switch (status.toLowerCase()) {
+                    case "normal":
+                        fileStatus.classList.add("normal");
+                        break;
+                    case "waiting":
+                        fileStatus.classList.add("waiting");
+                        break;
+                    case "error":
+                        fileStatus.classList.add("error");
+                        break;
+                    default:
+                        fileStatus.style.color = "#000";
+                        break;
+                }
+
+                fileStatus.textContent = status;
+
                 const contextMenu = document.getElementById("context-menu");
-                listItem.textContent = `${file_name}, ${formattedDate}, ${formattedFileSize}, ${status}`;
+                listItem.appendChild(fileNames);
+                listItem.appendChild(fileDates);
+                listItem.appendChild(fileSizes);
+                listItem.appendChild(fileStatus);
 
                 listItem.addEventListener("contextmenu", function (e) {
                     e.preventDefault();
@@ -241,6 +269,8 @@ function uploadFile() {
 
     uploadProgress.style.display = 'block';
     uploadProgress.value = 0;
+    document.querySelector('.file-upload-container').classList.add('show-progress');
+
 
     const xhr = new XMLHttpRequest();
 
@@ -273,6 +303,7 @@ function uploadFile() {
         uploadProgress.style.display = 'none';
     };
     xhr.send(formData);
+    uploadButton.disabled = false;
 }
 
 function addUrl() {
