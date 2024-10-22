@@ -81,17 +81,21 @@ input {
     border-radius: 4px; /* Rounded corners for input fields */
 }
 
+/*#file-list {*/
+/*    list-style: none; !* 去掉默认的列表样式 *!*/
+/*    padding: 0; !* 去掉内边距 *!*/
+/*    margin: 0; !* 去掉外边距 *!*/
+/*    max-width: 100%;*/
+/*    border: 1px solid #ddd; !* 添加边框 *!*/
+/*    border-radius: 8px; !* 圆角边框 *!*/
+/*    overflow: hidden; !* 隐藏溢出部分 *!*/
+/*    height: 300px;*/
+/*    overflow-y: auto;*/
+/*    background-color: #f9f9f9; !* 背景颜色 *!*/
+/*}*/
 #file-list {
-    list-style: none; /* 去掉默认的列表样式 */
-    padding: 0; /* 去掉内边距 */
     margin: 0; /* 去掉外边距 */
-    max-width: 100%;
-    border: 1px solid #ddd; /* 添加边框 */
-    border-radius: 8px; /* 圆角边框 */
-    overflow: hidden; /* 隐藏溢出部分 */
-    height: 300px;
-    overflow-y: auto;
-    background-color: #f9f9f9; /* 背景颜色 */
+    padding: 0; /* 去掉内边距 */
 }
 
 #file-list li {
@@ -224,4 +228,47 @@ input {
 .selected {
     background-color: #e0f7fa; /* Change background color on hover */
     border-color: #00796b; /* Change border color on hover */
+}
+
+table {
+    width: 100%; /* 表格宽度 */
+    border-collapse: collapse; /* 合并边框 */
+    margin-top: 20px; /* 表格顶部间距 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+    border-radius: 8px; /* 圆角 */
+    overflow: hidden; /* 防止圆角被边框影响 */
+}
+
+th, td {
+    border: 1px solid #ddd; /* 边框颜色 */
+    padding: 12px; /* 内边距 */
+    text-align: left; /* 文本左对齐 */
+}
+
+th {
+    background-color: #add8e6; /* 淡蓝色 */
+    color: black; /* 表头字体颜色 */
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* 偶数行背景颜色 */
+}
+
+tr:hover {
+    background-color: #e8f5e9; /* 鼠标悬停行的背景颜色 */
+}
+
+.file-name {
+    max-width: 150px; /* 设置最大宽度 */
+    white-space: nowrap; /* 不换行 */
+    overflow: hidden; /* 隐藏超出部分 */
+    text-overflow: ellipsis; /* 省略号 */
+}
+
+#context-menu {
+    display: none;
+    position: absolute;
+    background-color: transparent; /* 80%透明 */
+    border: none;
+    padding: 10px;
 }
