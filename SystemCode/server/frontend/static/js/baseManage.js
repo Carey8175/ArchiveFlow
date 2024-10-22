@@ -15,11 +15,11 @@ const sidebarMenu = document.getElementById("sidebar-context-menu");
 
 const fileList = document.getElementById("file-list");
 const fileInput = document.getElementById("file");
-const uploadButton = document.getElementById("upload-button");
 const allowedExtensions = ['.txt', '.pdf', '.docx', '.md', '.jpg', '.jpeg', '.png'];
 const urlInput = document.getElementById('url-input');
-const addButton = document.getElementById("add-url-button");
 const uploadProgress = document.getElementById('upload-progress');
+const uploadButton = document.getElementById("upload-button");
+const addButton = document.getElementById("add-url-button");
 
 export function manageKnowledgebase(selectedKnowledgebase) {
     databaseManagement.style.display = "block";
@@ -28,17 +28,16 @@ export function manageKnowledgebase(selectedKnowledgebase) {
         editKnowledgebase(selectedKnowledgebase);
     };
 
-    uploadButton.disabled = false;
-    document.getElementById("upload-button").onclick = function() {
+    uploadButton.onclick = function() {
         uploadButton.disabled = true;
-        uploadFile(selectedKnowledgebase);
-    };
+        uploadFile();
+    }
 
-    addButton.disabled = false;
-    document.getElementById("add-url-button").onclick = function() {
+    addButton.onclick = function() {
+        addButton.disabled = true;
+        addUrl(selectedKnowledgebase);
         addButton.disabled = false;
-        addUrl(selectedKnowledgebase)
-    };
+    }
 
     loadFileList();
 }
@@ -285,6 +284,7 @@ function uploadFile() {
     document.querySelector('.file-upload-container').classList.add('show-progress');
 
 
+    uploadButton.disabled = true;
     const xhr = new XMLHttpRequest();
 
     xhr.upload.addEventListener("progress", (event) => {
@@ -309,14 +309,15 @@ function uploadFile() {
             alert("Error uploading file.");
         }
         uploadProgress.style.display = 'none';
+        uploadButton.disabled = false;
     };
 
     xhr.onerror = () => {
         alert("Error uploading file.");
         uploadProgress.style.display = 'none';
+        uploadButton.disabled = false;
     };
     xhr.send(formData);
-    uploadButton.disabled = false;
 }
 
 function addUrl() {
