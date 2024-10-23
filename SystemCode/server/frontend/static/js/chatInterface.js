@@ -32,6 +32,7 @@ let chatHistory = [];
 let selectedModel = null;
 let isMultiTurnEnabled = false;
 let isRetrivalEnabled = false;
+let chatOrder = 0;
 
 modelSettingsButton.addEventListener('click', () => {
     modal.style.display = 'block';
@@ -135,6 +136,7 @@ function toggleMultiTurn() {
 function sendMessage() {
     const userId = getCookie('user_id');
     const currentMessage = document.getElementById("message-input").value.trim(); // Get the message
+    chatOrder += 1;
 
     let selectedModel;
     if (document.getElementById("model-select").value === "custom") {
@@ -161,6 +163,10 @@ function sendMessage() {
 
     sendButton.disabled = true;
     addMessageToChat('user', currentMessage);
+    document.getElementById("message-input").value = '';
+    // add loading circle
+    showProcessing(isRetrivalEnabled, chatOrder)
+
     // Check if retrieval is enabled
     if (isRetrivalEnabled) {
         // Send the query to the retrieval URL
@@ -197,6 +203,11 @@ function sendMessage() {
 
             // Now handle message sending
             handleSendMessage(userId, selectedModel, retrivalMessages, currentMessage);
+            // change the class of loading circle
+            const retrievalLoadingIcon = document.getElementById(`loading-icon-retrieval-${chatOrder}`)
+            retrievalLoadingIcon.classList.remove('loading-circle');
+            retrievalLoadingIcon.classList.add('success-circle');
+
         })
         .catch(error => {
             console.error('Error during retrieval:', error);
@@ -278,6 +289,12 @@ async function sendToBackend(userId, model, messageList) {
             }
         }
         chatHistory.push({ role: 'assistant', content: completeResponse});
+
+        // change the icon
+        const generateLoadingIcon = document.getElementById(`loading-icon-generate-${chatOrder}`)
+        generateLoadingIcon.classList.remove('loading-circle');
+        generateLoadingIcon.classList.add('success-circle');
+
     }catch (error){
         chatContainer.innerHTML = 'Error: ' + error.message;
     }
@@ -385,4 +402,24 @@ function getCookie(name) {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
     return null;
+}
+
+function showProcessing(isRetrivalEnabled, order) {
+    const loadingContainer = document.createElement('div');
+    loadingContainer.classList.add('message');
+    loadingContainer.classList.add('info');
+    if (isRetrivalEnabled) {
+        const retrievalLoading = document.createElement('div');
+        retrievalLoading.innerHTML = `<span id=\"loading-icon-retrieval-${order}\" class=\"loading-circle\"></span> <!-- 新增loading圈 -->\n` +
+            `<span id=\"loading-text-retrieval\">Retrieval</span> <!-- 新增描述文字 -->`
+
+        loadingContainer.appendChild(retrievalLoading);
+    }
+
+    const generateLoading = document.createElement('div');
+    generateLoading.innerHTML = `<span id=\"loading-icon-generate-${order}\" class=\"loading-circle\"></span> <!-- 新增loading圈 -->\n` +
+        `<span id=\"loading-text-generate\">Generate</span> <!-- 新增描述文字 -->`
+
+    loadingContainer.appendChild(generateLoading);
+    chatContainer.appendChild(loadingContainer);
 }

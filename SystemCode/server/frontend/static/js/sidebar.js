@@ -96,6 +96,20 @@ knowledgebaseList.addEventListener("click", function (event) {
 
     selectedKnowledgebase = { kb_id, kb_name };
 
+    chatInterface.classList.add('fade-out');
+
+    // 监听动画结束事件
+    chatInterface.addEventListener('animationend', () => {
+        // 动画结束后，移除淡出类，并添加淡入类
+        chatInterface.classList.remove('fade-out');
+        chatInterface.classList.add('fade-in');
+
+        // 确保在淡入前等一段时间
+        setTimeout(() => {
+            chatInterface.classList.remove('fade-in'); // 可选：移除淡入类，保持最终状态
+        }, 50); // 500ms后移除淡入类
+    }, { once: true }); // 只监听一次
+
     // Enter chat interface for selected knowledgebase
     goToChatInterface(selectedKnowledgebase);
 });
