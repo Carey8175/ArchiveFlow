@@ -148,7 +148,7 @@ function loadFileList(e) {
                     timestamp.substring(8, 10),
                     timestamp.substring(10, 12)
                 );
-                const formattedDate = fileDate.toLocaleString().replace("T", " ").replace(",", " ").substring(0, 16);
+                const formattedDate = fileDate.toLocaleString().replace("T", " ").replace(",", " ");
 
                 let formattedFileSize;
                 if (file_size < 1024) {
