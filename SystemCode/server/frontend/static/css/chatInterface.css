@@ -53,15 +53,63 @@ body {
     overflow: hidden; /* 超出内容隐藏 */
 }
 .assistant {
-background-color: #e9ecef;
-float: left;
-clear: both;
+    background-color: #e9ecef;
+    float: left;
+    clear: both;
 }
 .user {
-background-color: #007bff;
-color: white;
-float: right;
-clear: both;
+    background-color: #007bff;
+    color: white;
+    float: right;
+    clear: both;
+}
+.info {
+    color: #9E9E9E;
+    float: right;
+    clear: both;
+}
+
+/* 调整loading圈大小和样式 */
+.loading-circle {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.success-circle {
+  border: 2px solid #28a745; /* 绿色边框 */
+  border-radius: 50%;
+  width: 12px; /* 设置宽度 */
+  height: 12px; /* 设置高度 */
+  display: inline-block;
+  margin-right: 8px; /* 与文字的间距 */
+  background-color: transparent; /* 内部设置为透明 */
+}
+
+/* 清除浮动 */
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* 保证loading圈和文字垂直居中且不与消息并排 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 10px 0;
+  clear: both; /* 清除浮动，避免与文字混排 */
 }
 
 /* 清除浮动 */
