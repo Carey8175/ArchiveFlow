@@ -95,7 +95,10 @@ class MySQLClient:
         query = """
             CREATE TABLE IF NOT EXISTS User (
                 user_id VARCHAR(255) PRIMARY KEY,
-                user_name VARCHAR(255)
+                user_name VARCHAR(255),
+                api_key VARCHAR(255),
+                base_url VARCHAR(255),
+                model VARCHAR(255)
             );
         """
 
