@@ -1,9 +1,33 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0; /* Background color retained */
+    background-color: #FFFFFF; /* Background color retained */
     margin: 0;
     padding: 20px;
 }
+
+aside {
+    background-color: #FFFAFA;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.fade-out {
+    animation: fadeOut 0.2s ease forwards; /* 淡出动画 */
+}
+
+.fade-in {
+    animation: fadeIn 0.2s ease forwards; /* 淡入动画 */
+    display: block; /* 确保在淡入时可见 */
+}
+
 
 /* Basic styles for the knowledge base list */
 #knowledgebase-list {
@@ -30,18 +54,19 @@ body {
 
 
 #chat-interface {
-    background-color: transparent; /* Make chat interface background transparent */
+    background-color: transparent;
     border-radius: 0; /* Remove border radius */
     box-shadow: none; /* Remove shadow */
     padding: 0; /* Remove padding */
-    max-width: 1050px; /* Set max width if necessary */
+    /*max-width: 1050px; !* Set max width if necessary *!*/
     margin: auto;
     display: flex;
     flex-direction: column;
-    height: 600px; /* 设置高度 */
-    max-height: 600px; /* 设置最大高度 */
+    height: 700px; /* 设置高度 */
+    /*max-height: 800px; !* 设置最大高度 *!*/
     overflow-y: auto; /* 如果内容超出，显示纵向滚动条 */
 }
+
 .message {
     padding: 10px; /* 内边距 */
     margin: 5px; /* 上下间距 */
@@ -149,16 +174,18 @@ h2 {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    padding: 10px;
+    padding: 20px;
     position: fixed;
-    top: calc(50% + 240px);
-    left: 39%;
-    right: 0;
-    width: 45%;
-    z-index: 1000; /* 提高层级*/
-    /*border: 1px solid #ccc; !* 边框样式 *!*/
-    border: none; /* 边框样式 */
+    top: calc(50% + 260px);
+    left: 30%;
+    width: 63%;
+    z-index: 1000;
     height: 15px;
+    background-color: #e9efef; /* Change background color on hover */
+    border: 2px solid #cfd4d6;
+    border-radius: 10px;
+    box-shadow: 0 10px 10px rgb(200, 196, 196);
+    margin: 10px;
 }
 
 #message-input {
@@ -167,23 +194,17 @@ h2 {
     margin-right: 10px;
     border: 1px solid #ccc; /* 边框样式 */
     height: 14px;
+    width: 70%;
     background-color: #f0f0f0;
     border-radius: 4px;
 }
 
-.button-container {
+#button-container {
     display: flex;
     justify-content: space-between;
-    /*margin-top: 10px;*/
-    position: fixed;
-    top: calc(50% + 240px);
-    left: 29%; /* 左侧对齐到页面中心 */
-    right: 0;
-    width: 8%;
-    z-index: 1000; /* 提高层级，确保在其他内容上面 */
-    /*border: 1px solid #ccc; !* 边框样式 *!*/
-    border: none; /* 边框样式 */
-    /*height: 14px;*/
+    position: relative;
+    z-index: 1000;
+    border: none;
 }
 
 button {
@@ -296,7 +317,7 @@ button:hover {
     transition: background-color 0.3s;
     margin-left: 5px;
     /*left: 80%;*/
-    /*right:0;*/
+    right:0;
     /*transform: translateX(50%);*/
     max-width: 15%; /* 控制最大宽度，保持一定的边距 */
     height: 36px;
