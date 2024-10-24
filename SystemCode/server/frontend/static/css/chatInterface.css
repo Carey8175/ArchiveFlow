@@ -62,7 +62,7 @@ aside {
     margin: auto;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 700px; /* 设置高度 */
     /*max-height: 800px; !* 设置最大高度 *!*/
     overflow-y: auto; /* 如果内容超出，显示纵向滚动条 */
 }
@@ -139,10 +139,9 @@ aside {
 
 /* 清除浮动 */
 #chat-box::after {
-    content: "";
-    clear: both;
-    display: table;
-    height: 600px;
+content: "";
+clear: both;
+display: table;
 }
 
 h2 {
