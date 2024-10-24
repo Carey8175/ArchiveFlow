@@ -58,9 +58,10 @@ button:hover {
 
 aside {
     width: 18%;
-    padding: 20px;
+    padding: 10px;
     background-color: #fff;
     border-right: 1px solid #ddd;
+    height: 90vh;
 }
 
 main {

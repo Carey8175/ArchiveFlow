@@ -62,7 +62,7 @@ aside {
     margin: auto;
     display: flex;
     flex-direction: column;
-    height: 700px; /* 设置高度 */
+    height: 90vh; /* 设置高度 */
     /*max-height: 800px; !* 设置最大高度 *!*/
     overflow-y: auto; /* 如果内容超出，显示纵向滚动条 */
 }
@@ -176,8 +176,8 @@ h2 {
     align-items: center;
     padding: 20px;
     position: fixed;
-    top: calc(50% + 260px);
-    left: 30%;
+    top: calc(88%);
+    left: 25%;
     width: 63%;
     z-index: 1000;
     height: 15px;
