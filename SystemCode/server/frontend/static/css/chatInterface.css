@@ -128,7 +128,6 @@ aside {
   clear: both;
 }
 
-/* 保证loading圈和文字垂直居中且不与消息并排 */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -137,11 +136,15 @@ aside {
   clear: both; /* 清除浮动，避免与文字混排 */
 }
 
-/* 清除浮动 */
+#chat-box {
+    margin-bottom: 20%;
+    position: relative;
+}
+
 #chat-box::after {
-content: "";
-clear: both;
-display: table;
+    content: "";
+    clear: both;
+    display: table;
 }
 
 h2 {
