@@ -17,51 +17,85 @@ As ArchiveFlow evolves, future improvements may include more intelligent AI-driv
 
 ## SECTION 3 : CREDITS / PROJECT CONTRIBUTION
 
-| Official Full Name  | Student ID (MTech Applicable)  | Work Items (Who Did What) | Email (Optional) |
-| :------------ |:---------------:| :-----| :-----|
+| Official Full Name  | Student ID (MTech Applicable)  | Work Items (Who Did What)                                                                                                                                                                                                                                                                                                                                                                                                                           | Email (Optional) |
+| :------------ |:---------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| :-----|
 | Wang Wenjie | A0296855H | **(Full Stack)**<br/>**Back-end**: Development of service layer and relevant SDKs such as the file parsing module, model manager module and etc; system architecture design;<br/>**Front-end**: Interface enhancement and optimization;<br/>**Server Operations**: Deployment of the entire system on the server, database design and management;<br/>**Other work**:System Architecture Description Video,  Optimization the final team report and | E1350993@u.nus.edu |
-| Wu Zhengxi | A0296199E | **Back-end**: Development of Relevant APIs, such as file management, LLMs chat and etc; The workflow from file content parsing to vector embedding and storage in the database<br />**Front-end**: Interface Optimization;<br />**Other work**: Video of System Promotion | e1350337@u.nus.edu |
-| Sun Yanshu | A0296705U | **Front-end**:Website design including Login, chat interface and File management pages, completing relevant js scripts these pages used,  Interface enhancement and optimization.<br />**Back-end:**Development of  the URL scraping in file parsing module.<br />**Other work**: Preparation of  final team report and user guide; mapped system functionalities against knowledge | e1350843@u.nus.edu |
+| Wu Zhengxi | A0296199E | **Back-end**: Development of Relevant APIs, such as file management, LLMs chat and etc; The workflow from file content parsing to vector embedding and storage in the database<br />**Front-end**: Interface Optimization;<br />**Other work**: Video of System Promotion                                                                                                                                                                           | e1350337@u.nus.edu |
+| Sun Yanshu | A0296705U | **Front-end**:Website design including Login, chat interface and File management pages, completing relevant js scripts these pages used,  Interface enhancement and optimization.<br />**Back-end**:Development of  the URL scraping in file parsing module.<br />**Other work**: Preparation of  final team report and user guide; mapped system functionalities against knowledge                                                                 | e1350843@u.nus.edu |
 
 ---
 
 ## SECTION 4 : VIDEO OF SYSTEM MODELLING & USE CASE DEMO
 
-[![Sudoku AI Solver](http://img.youtube.com/vi/-AiYLUjP6o8/0.jpg)](https://youtu.be/-AiYLUjP6o8 "Sudoku AI Solver")
+### Promotion Video of Archive Flow
 
-Note: It is not mandatory for every project member to appear in video presentation; Presentation by one project member is acceptable. 
-More reference video presentations [here](https://telescopeuser.wordpress.com/2018/03/31/master-of-technology-solution-know-how-video-index-2/ "video presentations")
+[![Watch the video](https://img.youtube.com/vi/fzYRbQtPjWk/maxresdefault.jpg)](https://www.youtube.com/watch?v=fzYRbQtPjWk)
+
+### System Framework in Archive Flow
+
+[![Watch the video](https://img.youtube.com/vi/kHboWkzAx4A/maxresdefault.jpg)](https://www.youtube.com/watch?v=kHboWkzAx4A)
 
 ---
 
-## SECTION 5 : USER GUIDE
+## Install
 
-`Refer to appendix <Installation & User Guide> in project report at Github Folder: ProjectReport`
+We have set up a website to help you quickly experience Archive Flow! 🚀 [Click here](http://47.108.135.173) to start your journey! 🌟
 
-### [ 1 ] To run the system using iss-vm
+*Note:This website is hosted on a server in China, so you may experience network lag if accessing it from outside the country.*
 
-> download pre-built virtual machine from http://bit.ly/iss-vm
+#### 0. Requirements
 
-> start iss-vm
+1. Docker and Docker compose
 
-> open terminal in iss-vm
+2. Python >= 3.9
 
-> $ git clone https://github.com/telescopeuser/Workshop-Project-Submission-Template.git
+3. install the requirements
 
-> $ source activate iss-env-py2
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-> (iss-env-py2) $ cd Workshop-Project-Submission-Template/SystemCode/clips
+#### 1. Start Database
 
-> (iss-env-py2) $ python app.py
+Make sure you have installed **Docker** and **Docker Compose**. You can refer to the [Docker Installation Guide](https://docs.docker.com/compose/install/) for detailed instructions.
 
-> **Go to URL using web browser** http://0.0.0.0:5000 or http://127.0.0.1:5000
+After installing Docker, run the following command:
 
-### [ 2 ] To run the system in other/local machine:
-### Install additional necessary libraries. This application works in python 2 only.
+```bash
+docker compose up -d 
+```
 
-> $ sudo apt-get install python-clips clips build-essential libssl-dev libffi-dev python-dev python-pip
+In some versions of Docker you may need to run:
 
-> $ pip install pyclips flask flask-socketio eventlet simplejson pandas
+```bash
+docker-compose up -d
+```
+
+#### 2. Start Backend
+
+If your database and backend are on the same device, simply change `CONNECT_MODE=local`in `[SystemCode/configs/database.py]`. 
+
+If they are on different devices, update the host and port of your database in `[SystemCode/configs/database.py]` and set `CONNECT_MODE=remote`.
+
+You could start the Backend with just one command
+
+```bash
+python be_start.py
+```
+
+If you run the backend for the first time, it may take some time to download the relevant models. While the models are downloading, feel free to grab a coffee!
+
+#### 3. Start Frontend
+
+One command as well
+
+```bash
+python fe_start.py
+```
+
+#### 4. Enjoy  Archive Flow
+
+You can view the website at [http://127.0.0.1:18876](http://127.0.0.1:18876).
 
 ---
 ## SECTION 6 : PROJECT REPORT / PAPER
@@ -69,27 +103,29 @@ More reference video presentations [here](https://telescopeuser.wordpress.com/20
 `Refer to project report at Github Folder: ProjectReport`
 
 **Recommended Sections for Project Report / Paper:**
-- Executive Summary / Paper Abstract
-- Sponsor Company Introduction (if applicable)
-- Business Problem Background
-- Market Research
-- Project Objectives & Success Measurements
-- Project Solution (To detail domain modelling & system design.)
-- Project Implementation (To detail system development & testing approach.)
-- Project Performance & Validation (To prove project objectives are met.)
-- Project Conclusions: Findings & Recommendation
-- Appendix of report: Project Proposal
-- Appendix of report: Mapped System Functionalities against knowledge, techniques and skills of modular courses: MR, RS, CGS
-- Appendix of report: Installation and User Guide
-- Appendix of report: 1-2 pages individual project report per project member, including: Individual reflection of project journey: (1) personal contribution to group project (2) what learnt is most useful for you (3) how you can apply the knowledge and skills in other situations or your workplaces
-- Appendix of report: List of Abbreviations (if applicable)
-- Appendix of report: References (if applicable)
 
----
-## SECTION 7 : MISCELLANEOUS
+1. **PROJECT OVERVIEW** 
+2. **BUSINESS CASE AND MARKET RESEARCH** 
+2.1. BUSINESS CASE 
+2.2. MARKET RESEARCH 
+3. **SYSTEM DESIGN AND MODEL** 
+3.1. DATA LAYER 
+3.2. SERVER LAYER 
+3.3. PRESENTATION LAYER 
+4. **SYSTEM DEVELOPMENT AND IMPLEMENTATION** 
+4.1. DEVELOPMENT TOOLS AND TECHNOLOGIES 
+4.1.1 CORE TECHNOLOGIES 
+4.1.2 SERVER ARCHITECTURE 
+4.1.3 DATA RETRIEVAL PROCESS 
+4.2. IMPLEMENTATION PHASE 
+4.3. CHALLENGES ENCOUNTERED 
+5. **FINDINGS AND DISCUSSION** 
+5.1. KEY FINDINGS 
+DATABASE SERVER 
+BE SERVER 
+5.2. LIMITATION 
+6. **CONCLUSION AND FUTURE WORK** 
+6.1. CONCLUSION 
+6.2. FUTURE WORK 
+7. **APPENDICES** 
 
-`Refer to Github Folder: Miscellaneous`
-
-### HDB_BTO_SURVEY.xlsx
-* Results of survey
-* Insights derived, which were subsequently used in our system

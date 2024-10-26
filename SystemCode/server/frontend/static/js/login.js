@@ -1,7 +1,9 @@
-const backendHost = "http://47.108.135.173";
-const backendPort = "18777";
-const loginUrl = `${backendHost}:${backendPort}/api/orag/search/login`;
-const createUserUrl = `${backendHost}:${backendPort}/api/orag/add/user`;
+import config from "./config.js";
+
+const backendHost = config.be_host;
+const backendPort = config.be_port;
+const loginUrl = `http://${backendHost}:${backendPort}/api/orag/search/login`;
+const createUserUrl = `http://${backendHost}:${backendPort}/api/orag/add/user`;
 
 // Function to display messages
 function displayMessage(message, type) {

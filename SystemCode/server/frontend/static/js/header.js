@@ -1,5 +1,7 @@
-const backendHost = "http://47.108.135.173";
-const backendPort = "18777";
+import config from "./config.js";
+
+const backendHost = 'http://' + config.be_host;
+const backendPort = config.be_port;
 const renameUserUrl = `${backendHost}:${backendPort}/api/orag/update/user_name`; // Rename user API endpoint
 
 const renameButton = document.getElementById("rename-button");
